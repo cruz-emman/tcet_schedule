@@ -54,6 +54,191 @@ interface Props {
 
 type OverviewTableRow = GetOverDataReponseType[0]
 
+const ActionCell = ({ row }) => {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const id = row.original.id;
+  const isCurrentlyApproved = row.original.status === 'approved';
+
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [openDoneDialog, setOpenDoneDialog] = useState(false);
+
+  const { mutate: approvedButton } = useMutation({
+    mutationFn: (id: string) => ApprovedAppointment(id),
+    onError: (error) => {
+      toast.error('Failed to approve appointment', {
+        id: "update-appointment-error"
+      });
+    },
+    onSuccess: () => {
+      toast.success(`Appointment named ${row.original.title} has been approve successfully 🎉`, {
+        id: "update-appointment-success"
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["data", "history"]
+      });
+    },
+  });
+
+  const { mutate: doneAppointment } = useMutation({
+    mutationFn: (id: string) => DoneAppointment(id),
+    onError: (error) => {
+      toast.error('Failed to approve appointment', {
+        id: "update-appointment-error"
+      });
+    },
+    onSuccess: () => {
+      toast.success(`Appointment named ${row.original.title} has been approve successfully 🎉`, {
+        id: "update-appointment-success"
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["data", "history"]
+      });
+    },
+  });
+
+  const { mutate: pendingButton } = useMutation({
+    mutationFn: (id: string) => PendingAppointment(id),
+    onError: (error) => {
+      toast.error(`Failed to update appointment`, {
+        id: "update-appointment-error"
+      });
+    },
+    onSuccess: () => {
+      toast.warning(`Appointment named ${row.original.title} has been moved to pending 🎉`, {
+        id: "update-appointment-success"
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["data", "history"]
+      });
+    }
+  });
+
+  const { mutate: cancelAppointment } = useMutation({
+    mutationFn: (id: string) => CancelAppointment(id),
+    onError: (error) => {
+      toast.error(`Failed to update appointment`, {
+        id: "update-appointment-error"
+      });
+    },
+    onSuccess: () => {
+      toast.warning(`Appointment named ${row.original.title} has been cancel  🎉`, {
+        id: "update-appointment-success"
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["data", "history"]
+      });
+    }
+  });
+
+  const { mutate: softDelete } = useMutation({
+    mutationFn: (id: string) => SoftDeleteAppointment(id),
+    onError: (error) => {
+      toast.error(`Failed to update appointment`, {
+        id: "update-appointment-error"
+      });
+    },
+    onSuccess: () => {
+      toast.warning(`Appointment named ${row.original.title} has been deleted permanently 🎉`, {
+        id: "update-appointment-success"
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["data", "history"]
+      });
+    }
+  });
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem onClick={() => router.push(`edit/${id}`)}>
+            <PanelRightCloseIcon className="mr-2 h-4 w-4" />
+            View Details
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <UserPlus className="mr-2 h-4 w-4" />
+              <span>Update</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent>
+                {!isCurrentlyApproved ? (
+                  <DropdownMenuItem onClick={() => approvedButton(id)}>
+                    <Check className="mr-2 h-4 w-4 text-emerald-600" />
+                    <span>Approved</span>
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem onClick={() => setOpenDoneDialog(true)}>
+                    <Check className="mr-2 h-4 w-4 text-emerald-600" />
+                    <span>Mark as Done</span>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={() => pendingButton(id)}>
+                  <CircleDot className="mr-2 h-4 w-4 text-rose-600" />
+                  <span>Pending</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+          <DropdownMenuItem onClick={() => setOpenDeleteDialog(true)}>
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the event and hide your data from our dashboard.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setOpenDeleteDialog(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction asChild>
+              <Button variant="destructive" onClick={() => cancelAppointment(id)}>
+                Delete
+              </Button>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={openDoneDialog} onOpenChange={setOpenDoneDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to mark this as done?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action will mark the appointment as completed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setOpenDoneDialog(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction asChild>
+              <Button onClick={() => doneAppointment(id)}>
+                Mark as Done
+              </Button>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+};
+
+
 const columns: ColumnDef<OverviewTableRow>[] = [
   {
     accessorKey: "event_date",
@@ -147,201 +332,7 @@ const columns: ColumnDef<OverviewTableRow>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-
-
-      const id = row.original.id
-      const router = useRouter()
-      const queryClient = useQueryClient();
-      const isCurrentlyApproved = row.original.status === 'approved'
-
-      const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-      const [openDoneDialog, setOpenDoneDialog] = useState(false);
-
-      const { mutate: approvedButton } = useMutation({
-        mutationFn: (id: string) => ApprovedAppointment(id),
-        onError: (error) => {
-          toast.error('Failed to approve appointment', {
-            id: "update-appointment-error"
-          });
-        },
-        onSuccess: () => {
-          toast.success(`Appointment named ${row.original.title} has been approve successfully 🎉`, {
-            id: "update-appointment-success"
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["data", "history"]
-          });
-        },
-
-      });
-
-      const { mutate: doneAppointment } = useMutation({
-        mutationFn: (id: string) => DoneAppointment(id),
-        onError: (error) => {
-          toast.error('Failed to approve appointment', {
-            id: "update-appointment-error"
-          });
-        },
-        onSuccess: () => {
-          toast.success(`Appointment named ${row.original.title} has been approve successfully 🎉`, {
-            id: "update-appointment-success"
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["data", "history"]
-          });
-        },
-
-      });
-
-      const { mutate: pendingButton } = useMutation({
-        mutationFn: (id: string) => PendingAppointment(id),
-        onError: (error) => {
-          toast.error(`Failed to update appointment`, {
-            id: "update-appointment-error"
-          });
-        },
-        onSuccess: () => {
-          toast.warning(`Appointment named ${row.original.title} has been moved to pending 🎉`, {
-            id: "update-appointment-success"
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["data", "history"]
-          });
-        }
-      });
-
-      const { mutate: cancelAppointment } = useMutation({
-        mutationFn: (id: string) => CancelAppointment(id),
-        onError: (error) => {
-          toast.error(`Failed to update appointment`, {
-            id: "update-appointment-error"
-          });
-        },
-        onSuccess: () => {
-          toast.warning(`Appointment named ${row.original.title} has been cancel  🎉`, {
-            id: "update-appointment-success"
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["data", "history"]
-          });
-        }
-      });
-
-      const { mutate: softDelete } = useMutation({
-        mutationFn: (id: string) => SoftDeleteAppointment(id),
-        onError: (error) => {
-          toast.error(`Failed to update appointment`, {
-            id: "update-appointment-error"
-          });
-        },
-        onSuccess: () => {
-          toast.warning(`Appointment named ${row.original.title} has been deleted permanently 🎉`, {
-            id: "update-appointment-success"
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["data", "history"]
-          });
-        }
-      });
-
-
-      return (
-        <>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-              <DropdownMenuItem onClick={() => router.push(`edit/${id}`)}>
-                <PanelRightCloseIcon className="mr-2 h-4 w-4" />
-                View Details
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  <span>Update</span>
-                </DropdownMenuSubTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuSubContent>
-                    {!isCurrentlyApproved ? (
-                      <DropdownMenuItem onClick={() => approvedButton(id)}>
-                        <Check className="mr-2 h-4 w-4 text-emerald-600" />
-                        <span>Approved</span>
-                      </DropdownMenuItem>
-                    ) : (
-                      <DropdownMenuItem onClick={() => setOpenDoneDialog(true)}>
-                        <Check className="mr-2 h-4 w-4 text-emerald-600" />
-                        <span>Mark as Done</span>
-                      </DropdownMenuItem>
-                    )}
-
-                    <DropdownMenuItem onClick={() => pendingButton(id)}>
-                      <CircleDot className="mr-2 h-4 w-4 text-rose-600" />
-                      <span>Pending</span>
-                    </DropdownMenuItem>
-                    {/* <DropdownMenuItem onClick={() => cancelAppointment(id)}>
-                      <Ban className="mr-2 h-4 w-4 text-rose-600" />
-                      <span>Cancel</span>
-                    </DropdownMenuItem> */}
-                    <DropdownMenuSeparator />
-                  </DropdownMenuSubContent>
-                </DropdownMenuPortal>
-              </DropdownMenuSub>
-              <DropdownMenuItem onClick={() => setOpenDeleteDialog(true)}>
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete the event and hide your data from our dashboard.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setOpenDeleteDialog(false)}>Cancel</AlertDialogCancel>
-                <AlertDialogAction asChild>
-                  <Button variant="destructive" onClick={() => cancelAppointment(id)}>
-                    Delete
-                  </Button>
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-
-          <AlertDialog open={openDoneDialog} onOpenChange={setOpenDoneDialog}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure you want to mark this as done?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action will mark the appointment as completed.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setOpenDoneDialog(false)}>Cancel</AlertDialogCancel>
-                <AlertDialogAction asChild>
-                  <Button onClick={() => doneAppointment(id)}>
-                    Mark as Done
-                  </Button>
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </>
-
-      )
-    }
+    cell: ({ row }) => <ActionCell row={row} />
   }
 ]
 

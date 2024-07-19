@@ -49,9 +49,9 @@ const ClientDashboard = () => {
                   <p>No event today</p>
                 ) : (
                 <>
-                  {dry_run_false?.map((item) => (
+                  {dry_run_false?.map((item, key) => (
                     <ScrollArea>
-                      <CardEvent data={item} />
+                      <CardEvent key={key} data={item} />
                     </ScrollArea>
                   ))}
                   </>
@@ -62,7 +62,7 @@ const ClientDashboard = () => {
           </div>
 
           <div className="flex flex-col flex-1 w-full ">
-            <h1 className="text-lg font-semibold text-gray-400">Dry Run</h1>
+            <h1 className="text-lg font-semibold  text-gray-400">Dry Run</h1>
             <div className="h-full flex max-h-[650px] overflow-y-auto flex-col gap-y-2 flex-grow ">
             <SkeletonWrapper isLoading={selectedDate.isFetching}>
                 {dry_run_true?.length === 0 ? (
@@ -70,9 +70,9 @@ const ClientDashboard = () => {
                 ) : (
                  
                   <>
-                    {dry_run_true?.map((item) => (
+                    {dry_run_true?.map((item, key) => (
                       <ScrollArea>
-                        <CardEvent data={item} />
+                        <CardEvent key={key} data={item} />
                       </ScrollArea>
                     ))}
                   </>
