@@ -8,9 +8,16 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// datasource db {
+//   provider = "mysql"
+//   url      = env("DATABASE_URL")
+// }
+
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+
 }
 
 enum UserRole {
@@ -19,7 +26,7 @@ enum UserRole {
 }
 
 model User {
-  id       String   @id @default(cuid())
+  id       String   @id 
   name     String?
   email    String   @unique
   password String?
@@ -29,7 +36,7 @@ model User {
 }
 
 model Appointment {
-  id String @id @default(uuid())
+  id String @id
 
   //SET 1
   title          String
@@ -69,7 +76,7 @@ model Appointment {
 }
 
 model ScheduleDate {
-  id String @id @default(uuid())
+  id String @id
 
   day   Int
   month Int

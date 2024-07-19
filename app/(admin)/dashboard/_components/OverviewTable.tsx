@@ -110,7 +110,7 @@ const columns: ColumnDef<OverviewTableRow>[] = [
         return null
       }
 
-        const type = row.original.meeting_type_option
+      const type = row.original.meeting_type_option
       return (
         <Badge variant={type} className={cn('flex w-[120px] justify-center text-sm',)}>
          {status.label} 
