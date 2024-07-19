@@ -96,6 +96,7 @@ const columns: ColumnDef<OverviewTableRow>[] = [
 
       const type = row.original.meeting_type_option
       return (
+        //@ts-ignore
         <Badge variant={type} className={cn('flex w-[120px] justify-center text-sm',)}>
          {status.label} 
         </Badge>
