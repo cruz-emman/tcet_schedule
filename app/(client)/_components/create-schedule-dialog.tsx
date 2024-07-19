@@ -1,0 +1,783 @@
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
+import { DialogTitle } from '@radix-ui/react-dialog';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react'
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { CreateAppointmentSchema, CreateAppointmentSchemaType } from '@/schema/appointment';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon, Loader2 } from 'lucide-react';
+import { format } from 'date-fns';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import SelectFieldInput from './select-field_input';
+import { does_have_assistance_choice, hybridChoice, photoVideoChoice, purposeChoice, trainingChoice, zoomMeetingChoice, zoomWebinarChoice } from '@/lib/data';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Calendar } from '@/components/ui/calendar';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Separator } from '@/components/ui/separator';
+import CheckboxFieldInput from './check-field-input';
+import TableDataSample from './table-data';
+import FinalizeForm from './form-review';
+import SeletGroupFieldInput from './select-time';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { CreateAppointment } from '../_actions/appoint-schedule';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import { useCurrentUser } from '@/hooks/user-current-user';
+
+
+interface Props {
+  trigger?: ReactNode;
+  open?: boolean;
+  setOpen?: any;
+  pickedDate: Date | undefined;
+}
+
+
+const steps = [
+  {
+    id: 'Step 1',
+    name: 'General Information',
+    fields: ['title', 'email', 'fullname', 'contact_person', 'department']
+  },
+  {
+    id: 'Step 2',
+    name: 'Date, Time and Purpose',
+    fields: ['event_date, start_time', 'end_time', 'purpose']
+  },
+  {
+    id: "Step 3",
+    name: "Dry Run",
+    fields: ['does_have_dry_run', 'dry_run_date', 'dry_run_start_time', 'dry_run_end_time', 'does_have_assistance', 'name_of_assistance']
+  },
+  {
+    id: "Step 4",
+    name: "Type of Service",
+    fields: ['meeting_type_option', 'meeting_type_service', 'meeting_type_link', 'camera_setup']
+  },
+  {
+    id: "Steps 5",
+    name: "Type of Service",
+
+  }
+]
+
+
+const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
+
+
+  const user = useCurrentUser()
+
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [meetingType, setMeetingType] = useState("meeting"); // Optional
+  const [confirmAgreement, setConfirmAgreement] = useState(false);
+
+
+  const [step, setStep] = useState(0);
+  const currentStep = steps[step];
+
+
+
+  const form = useForm<CreateAppointmentSchemaType>({
+    resolver: zodResolver(CreateAppointmentSchema),
+    defaultValues: {
+      title: '',
+      email: '',
+      fullname: '',
+      contact_person: '',
+      department: '',
+      //Step 2
+      purpose: '',
+      event_date: pickedDate, // Use the pickedDate prop here
+      start_time: '',
+      end_time: '',
+      venue: '',
+      // //Step 3
+      does_have_dry_run: false,
+      dry_run_date: undefined,
+      dry_run_start_time: '',
+      dry_run_end_time: '',
+      does_have_assistance: ["tcet"],
+      name_of_assistance: '',
+      // //Step 4
+      meeting_type_option: 'meeting',
+      meeting_type_service: [],
+      meeting_type_link: '',
+      camera_setup: '',
+      status: 'pending'
+    }
+  })
+
+  type FieldName = keyof CreateAppointmentSchemaType;
+
+
+  const nextStep = async () => {
+    const fields = steps[step].fields as FieldName[];
+    console.log("Fields to validate:", fields);
+
+    const isValid = await form.trigger(fields, { shouldFocus: true });
+    console.log("Validation result:", isValid, form.formState.errors);
+
+
+    if (!isValid) return;
+
+    setStep((prevStep) => prevStep + 1);
+  };
+
+  const prevStep = () => {
+    if (step > 0) {
+      setStep(step - 1);
+    }
+
+    if (step !== steps.length) {
+      setConfirmAgreement(false);
+    }
+  };
+
+
+  useEffect(() => {
+    if (pickedDate) {
+      form.setValue('event_date', pickedDate);
+    }
+  }, [pickedDate, form]);
+
+
+  const queryClient = useQueryClient()
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: CreateAppointment,
+    onSuccess: () => {
+      toast.success('Appointment created successfully 🎉', {
+        id: "create-appointment"
+      })
+
+      form.reset();
+      setStep(0)
+      setDialogOpen(false);
+      setOpen(false);
+      setConfirmAgreement(false)
+
+
+
+      queryClient.invalidateQueries({ queryKey: ["appointment"] });
+    }
+
+  })
+
+
+
+
+  const onSubmit = useCallback((values: CreateAppointmentSchemaType) => {
+    // toast.loading("Creating Appointment...", {id: 'create-appointment'});
+    mutate(values)
+
+
+
+  }, [mutate])
+
+  //BUTTONS FOR RESESTING FORM FIELDS
+
+  let hasOtherAssistance = form.watch("does_have_assistance");
+  let watchChoices = form.watch(["meeting_type_service"]);
+
+
+  const handleClick = () => {
+    form.resetField("dry_run_date");
+    form.resetField("dry_run_start_time");
+    form.resetField("dry_run_end_time");
+  };
+
+  const handleMeetingTypeChange = (newMeetingType: any) => {
+    form.setValue("meeting_type_option", newMeetingType);
+    form.setValue("meeting_type_service", []);
+    form.resetField("meeting_type_link");
+    form.resetField("camera_setup");
+    setMeetingType(newMeetingType);
+  };
+
+  const confirmAgreementFuntion = () => {
+    setConfirmAgreement((prev) => !prev);
+  };
+
+
+
+  return (
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <DialogTrigger asChild>
+        <Button
+          disabled={!open}
+          className='w-full'
+          color="primary-foreground"
+          onClick={() => setDialogOpen(true)}
+
+        >Add Schedule</Button>
+      </DialogTrigger>
+      <DialogContent className={
+        cn(
+          `max-w-[400px] md:max-w-[800px]`,
+        )}>
+        <DialogHeader>
+          <DialogTitle>{currentStep.name}</DialogTitle>
+          <DialogDescription>
+            Step {step + 1} of {steps.length}
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form} >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
+            {step == 0 && (
+              <div className='flex flex-col gap-y-2'>
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input type='text' placeholder="Title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="Email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="fullname"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Scheduled By:</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Scheduled By" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="contact_person"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Contact Person</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Contact Person" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="department"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Department</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Department" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
+            {step == 1 && (
+              <div className='flex flex-col gap-y-2'>
+
+
+                <FormField
+                  control={form.control}
+                  name="event_date"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Date of event</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                      </Popover>
+                    </FormItem>
+                  )}
+                />
+
+                <div className='flex flex-col  gap-2 w-full'>
+
+                <SeletGroupFieldInput
+                    name="start_time"
+                    placeholder="Select time"
+                    control={form.control}
+                    label="Start"
+                  />
+                  <SeletGroupFieldInput
+                    name="end_time"
+                    placeholder="Select time"
+                    control={form.control}
+                    label="End"
+                  />
+
+
+
+                </div>
+
+                <SelectFieldInput
+                  control={form.control}
+                  name="purpose"
+                  label="Purpose"
+                  placeholder="select a purpose"
+                  data={purposeChoice}
+                />
+                <FormField
+                  control={form.control}
+                  name="venue"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Venue (optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Venue" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+
+              </div>
+            )}
+            {step == 2 && (
+              <div className='flex flex-col gap-y-2'>
+                <FormField
+                  control={form.control}
+                  name="does_have_dry_run"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <FormLabel>
+                        (Optional) Preferred Meeting Date / Dry Run
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={(value) =>
+                            field.onChange(value === "true")
+                          }
+                          defaultValue={String(field.value)}
+                          className="flex flex-col space-y-1"
+                        >
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem
+                                onClick={handleClick}
+
+                                value="false" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              None / No
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="true" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Yes
+                            </FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+
+                      {field.value === true && (
+                        <FormItem>
+                          <div className="flex flex-col gap-2 pt-2">
+                            <Label>(Dry Run) Time of Event</Label>
+                            <div className="flex flex-col gap-2">
+                              <FormField
+                                control={form.control}
+                                name="dry_run_date"
+                                render={({ field }) => (
+                                  <FormItem className="flex flex-col">
+                                    <FormLabel>Date</FormLabel>
+                                    <Popover>
+                                      <PopoverTrigger asChild>
+                                        <FormControl>
+                                          <Button
+                                            variant={"outline"}
+                                            className={cn(
+                                              "w-[240px] pl-3 text-left font-normal",
+                                              !field.value &&
+                                              "text-muted-foreground"
+                                            )}
+                                          >
+                                            {field.value ? (
+                                              format(field.value, "PPP")
+                                            ) : (
+                                              <span>Pick a date</span>
+                                            )}
+                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                          </Button>
+                                        </FormControl>
+                                      </PopoverTrigger>
+                                      <PopoverContent
+                                        className="w-auto p-0"
+                                        align="start"
+                                      >
+                                        <Calendar
+                                          mode="single"
+                                          disabled={(date) =>
+                                            new Date(date) <= new Date()
+                                          } // Disable past dates and today's date
+                                          selected={field.value}
+                                          onSelect={field.onChange}
+                                          initialFocus
+                                        />
+                                      </PopoverContent>
+                                    </Popover>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <SeletGroupFieldInput
+                                name="dry_run_start_time"
+                                placeholder="Select time"
+                                control={form.control}
+                                label="Start"
+                              />
+                              <SeletGroupFieldInput
+                                name="dry_run_end_time"
+                                placeholder="Select time"
+                                control={form.control}
+                                label="End"
+                              />
+
+
+                            </div>
+                          </div>
+                        </FormItem>
+                      )}
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="does_have_assistance"
+                  render={() => (
+                    <FormItem>
+                      <div className="mb-4">
+                        <FormLabel className="text-base">
+                          Tech Assitance
+                        </FormLabel>
+                      </div>
+                      {does_have_assistance_choice.map((item) => (
+                        <FormField
+                          key={item.id}
+                          control={form.control}
+                          name="does_have_assistance"
+                          render={({ field }) => {
+                            return (
+                              <FormItem
+                                key={item.id}
+                                className="flex flex-row items-start space-x-3 space-y-0"
+                              >
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(item.id)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([
+                                          ...field.value,
+                                          item.id,
+                                        ])
+                                        : field.onChange(
+                                          field.value?.filter(
+                                            (value: any) =>
+                                              value !== item.id
+                                          )
+                                        );
+                                    }}
+                                  />
+                                </FormControl>
+
+                                <FormLabel className="font-normal">
+                                  {item.label}
+                                </FormLabel>
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      ))}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {hasOtherAssistance.includes("others") && (
+                  <FormField
+                    control={form.control}
+                    name="name_of_assistance"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Other Assistance</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="please type the other assitance"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
+            )}
+            {step == 3 && (
+              <div className='flex gap-2'>
+                <div className="flex flex-col md:flex-row gap-x-2 ">
+                  <div className=" flex-1 hidden md:flex">
+                    <TableDataSample />
+                  </div>
+                  <Separator
+                    className="mr-4 bg-violet-400 hidden md:block "
+                    orientation="vertical"
+                  />
+                  <div className="flex flex-col gap-y-2 flex-1 ">
+                    <FormField
+                      control={form.control}
+                      name="meeting_type_option"
+                      render={({ field }) => (
+                        <FormItem className="w-full">
+                          <FormLabel>Type of Service</FormLabel>
+                          <Select
+                            onValueChange={(value) =>
+                              handleMeetingTypeChange(value)
+                            }
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a meeting type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="meeting">
+                                Zoom Meeting
+                              </SelectItem>
+                              <SelectItem value="webinar">
+                                Zoom Webinar
+                              </SelectItem>
+                              <SelectItem value="hybrid">Hybrid</SelectItem>
+                              <SelectItem value="documentation">
+                                Documentation
+                              </SelectItem>
+                              <SelectItem value="training">
+                                Training
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {meetingType === "meeting" && (
+                      <>
+                        <CheckboxFieldInput
+                          control={form.control}
+                          name="meeting_type_service"
+                          data={zoomMeetingChoice}
+                          linkControl={form.control}
+                          openLiveStreaming={watchChoices}
+                          linkInputField="meeting_type_link"
+                        />
+                      </>
+                    )}
+
+                    {meetingType === "webinar" && (
+                      <>
+                        <CheckboxFieldInput
+                          control={form.control}
+                          name="meeting_type_service"
+                          data={zoomWebinarChoice}
+                          linkControl={form.control}
+                          openLiveStreaming={watchChoices}
+                          linkInputField="meeting_type_link"
+                        />
+                      </>
+                    )}
+
+                    {meetingType === "hybrid" && (
+                      <>
+                        <CheckboxFieldInput
+                          control={form.control}
+                          name="meeting_type_service"
+                          data={hybridChoice}
+                          linkControl={form.control}
+                          openLiveStreaming={watchChoices}
+                          linkInputField="meeting_type_link"
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="camera_setup"
+                          render={({ field }) => (
+                            <FormItem className="space-y-3">
+                              <FormLabel>Camera Setup</FormLabel>
+                              <FormControl>
+                                <RadioGroup
+                                  onValueChange={field.onChange}
+                                  defaultValue={field.value}
+                                  className="flex flex-col space-y-1"
+                                >
+                                  <FormItem className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                      <RadioGroupItem value="oneCamera" />
+                                    </FormControl>
+                                    <FormLabel>1 Camera set-up</FormLabel>
+                                  </FormItem>
+                                  <FormItem className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                      <RadioGroupItem value="twoCamera" />
+                                    </FormControl>
+                                    <FormLabel>2 Camera set-up</FormLabel>
+                                  </FormItem>
+                                </RadioGroup>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </>
+                    )}
+
+                    {meetingType === "documentation" && (
+                      <>
+                        <CheckboxFieldInput
+                          control={form.control}
+                          name="meeting_type_service"
+                          data={photoVideoChoice}
+                          linkControl={form.control}
+                          openLiveStreaming={watchChoices}
+                          linkInputField="meeting_type_link"
+                        />
+                      </>
+                    )}
+                    {meetingType === "training" && (
+                      <>
+                        <CheckboxFieldInput
+                          control={form.control}
+                          name="meeting_type_service"
+                          data={trainingChoice}
+                          linkControl={form.control}
+                          openLiveStreaming={watchChoices}
+                          linkInputField="meeting_type_link"
+                        />
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+            {step == 4 && (
+              <div className='flex flex-col  gap-2'>
+                <FinalizeForm form={form} />
+                <div className="items-top flex space-x-2">
+                  <Checkbox id="terms1" onClick={confirmAgreementFuntion} />
+                  <div className="grid gap-1.5 leading-none">
+                    <label
+                      htmlFor="terms1"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      I understand
+                    </label>
+                    <p className="text-sm text-muted-foreground">
+                      If you have{" "}
+                      <span className="font-bold text-red-500">
+                        Zoom Background, Banner, Poster or Program Flow
+                      </span>{" "}
+                      please email{" "}
+                      <span className="font-bold text-blue-600 underline">
+                        tcet@tua.edu.ph
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </form>
+
+        </Form>
+        <DialogFooter className='flex flex-col md:flex-row gap-2'>
+          <Button onClick={prevStep} disabled={step === 0}>Back</Button>
+          {step === steps.length - 1 ? (
+            <DialogClose asChild>
+              <Button
+                disabled={!confirmAgreement}
+                onClick={form.handleSubmit(onSubmit)}
+              >
+                {isPending && <div className='flex gap-x-2'>
+                  Submitting...
+                  <Loader2 className="animate-spin" />
+                </div> }
+                {!isPending && "Submit"}
+              </Button>
+            </DialogClose>
+
+          ) : (
+            <Button
+              onClick={nextStep}
+            >
+              Next
+            </Button>
+          )}
+        </DialogFooter>
+      </DialogContent>
+
+    </Dialog>
+  )
+}
+
+export default CreateScheduleDialog
