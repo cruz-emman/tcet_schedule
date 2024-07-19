@@ -73,35 +73,31 @@ export async function CreateAppointment(form: CreateAppointmentSchemaType) {
             }
         })
 
-    //     await client.sendEmailWithTemplate({
-    //         "From": "support@tcet.tualearning.com",
-    //         "To": email,
-    //         "TemplateId": 36635431,
-    //         "TemplateModel": {
-    //             "body": `
-    //   Dear ${fullname},
+        await client.sendEmail({
+            "From": "support@tcet.tualearning.com",
+            "To": email,
+            "Subject": "Appointment Confirmation",
+            "TextBody": `
 
-    //   Your appointment has been confirmed with the following details:
+                Dear ${fullname},
 
-    //   Title: ${title}
-    //   Date: ${event_date.toDateString()}
-    //   Time: ${start_time} - ${end_time}
-     
+                Your appointment has been confirmed with the following details:
 
-    //   Thank you for using our service.
+                Title: ${title}
+                Date: ${event_date.toDateString()}
+                Time: ${start_time} - ${end_time}
+                Purpose: ${purpose}
 
-    //   If you encounter any error or conecrn, please email tcet@tua.edu.ph
+                Thank you for using our service.
 
-    //   Best regards,
-    //   TCET
-    // `,
-    //             "attachment_details": [], // Add attachment details here if needed
-    //             "commenter_name": "Appointment System",
-    //             "timestamp": new Date().toISOString(),
+                Best regards,
+                Your Appointment Team
 
-    //         },
-    //         "MessageStream": "outbound"
-    //     },)
+                if you encounter any problem or conercn, please email tcet@tua.edu.ph
+            `,
+            "MessageStream": "outbound",
+
+        },)
     }, {
         timeout: 15000
     })

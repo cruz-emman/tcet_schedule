@@ -228,7 +228,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
       </DialogTrigger>
       <DialogContent className={
         cn(
-          `max-w-[400px] md:max-w-[800px]`,
+          `max-w-[400px] md:max-w-[900px]`,
         )}>
         <DialogHeader>
           <DialogTitle>{currentStep.name}</DialogTitle>
@@ -577,8 +577,8 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
               </div>
             )}
             {step == 3 && (
-              <div className='flex gap-2'>
-                <div className="flex flex-col md:flex-row gap-x-2 ">
+              <div className='flex gap-2 '>
+                <div className="flex flex-col w-full md:flex-row gap-x-2 ">
                   <div className=" flex-1 hidden md:flex">
                     <TableDataSample />
                   </div>
@@ -780,7 +780,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                 disabled={!confirmAgreement}
                 onClick={form.handleSubmit(onSubmit)}
               >
-                {isPending && <div className='flex gap-x-2'>
+                {isPending && <div className='flex items-center gap-x-2'>
                   Submitting...
                   <Loader2 className="animate-spin" />
                 </div>}
