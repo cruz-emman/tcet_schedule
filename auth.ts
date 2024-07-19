@@ -21,7 +21,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
         async jwt({ token, user }) {
             if(!token.sub) return token;
-
+                
             const existingUser = await db.user.findUnique({
                 where: {
                     id: token.sub

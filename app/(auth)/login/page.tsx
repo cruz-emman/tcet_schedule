@@ -24,9 +24,15 @@ const LoginForm = () => {
 
     const { mutate, isPending } = useMutation({
         mutationFn: LoginAccount,
-        onSuccess: () => {
-            toast.success("Successfully Login!")
-            router.push('/dashboard')
+        onSuccess: (data) => {
+            if(data?.success){
+                toast.success(data.success)
+                router.push('/dashboard')
+            }
+
+            if(data?.error){
+                toast.error(data.error)
+            }
         },
         onError: () => {
             toast.error("An unexpected error occurred.");

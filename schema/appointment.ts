@@ -114,7 +114,7 @@ export const CreateAppointmentSchema = z.object({
 
 
 
-    if ((meeting_type_service.includes('meeting_livestream') || meeting_type_service.includes('hybrid_livestreaming') || meeting_type_service.includes('webinar_livestreaming') || meeting_type_service.includes('documentation_LiveStreaming'))) {
+    if ((meeting_type_service.includes('meeting_livestream') || meeting_type_service.includes('hybrid_livestreaming') || meeting_type_service.includes('webinar_livestreaming') || meeting_type_service.includes('documentation_livestreaming') || meeting_type_service.includes('events_livestreaming'))) {
       if (!meeting_type_link) {
         ctx.addIssue({
           code: 'custom',
@@ -124,8 +124,8 @@ export const CreateAppointmentSchema = z.object({
       }
     }
 
-    if((meeting_type_service.includes('meeting_hybrid') || meeting_type_service.includes('webinar_hybrid'))){
-      if(!camera_setup){
+    if ((meeting_type_service.includes('meeting_hybrid') || meeting_type_service.includes('webinar_hybrid'))) {
+      if (!camera_setup) {
         ctx.addIssue({
           code: "custom",
           message: "Please provide meesing link",

@@ -9,24 +9,22 @@ import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
 import { Menu } from 'lucide-react'
 import { ThemeSwitcherBtn } from './theme/theme-switcher-btn'
 import { NavbarLinks } from '@/lib/data'
-import { auth } from '@/auth'
-import { useCurrentUser } from '@/hooks/user-current-user'
 import { SideBar } from './sidebar'
 
-export default function Navbar() {
+export default function Navbar({user}: any) {
 
 
     return (
         <>
-            <DesktopNavbar />
-            <MobileNavbar />
+            <DesktopNavbar user={user} />
+            <MobileNavbar user={user} />
         </>
     )
 }
 
 
 
-function MobileNavbar() {
+function MobileNavbar({user}:any) {
     const [isOpen, setIsOpen] = useState(false)
 
     return (
@@ -64,10 +62,10 @@ function MobileNavbar() {
     )
 }
 
-function DesktopNavbar() {
-    const user = useCurrentUser()
-    const pathname = usePathname()
-
+function DesktopNavbar({user}:any) {
+    
+    
+    
     return (
         <div className='hidden border-seperate border-b bg-background md:block'>
             <nav className="container flex items-center justify-between mx-auto">

@@ -1,24 +1,24 @@
 export const purposeChoice = [
   {
     id: 'class',
-    label: 'Online Class'
+    label: 'Class'
   },
   {
 
     id: 'academic_culminating_class',
-    label: 'Online Academic Culminating Classes'
+    label: 'Academic Culminating Classes'
   },
   {
     id: 'meeting',
-    label: 'Online Meeting'
+    label: 'Meeting'
   },
   {
     id: 'students_development',
-    label: 'Online Student Development'
+    label: 'Student Development'
   },
   {
     id: 'faculty_development',
-    label: 'Online Faculty Development'
+    label: 'Faculty Development'
   },
 
 ]
@@ -134,7 +134,7 @@ export const photoVideoChoice = [
   },
   {
 
-    id: 'documentation_LiveStreaming',
+    id: 'documentation_livestreaming',
     label: 'Live streaming'
   },
 ]
@@ -148,7 +148,11 @@ export const eventsChoice = [
 
     id: 'events_extracurricular',
     label: 'Events Extracurricular'
-  }
+  },
+  {
+    id: 'events_livestreaming',
+    label: 'Livestreaming'
+  },
 ]
 
 export const trainingChoice = [

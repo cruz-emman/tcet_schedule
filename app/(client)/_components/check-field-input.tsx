@@ -83,6 +83,8 @@ const CheckboxFieldInput = ({
 
       {(openLiveStreaming[0].includes("meeting_livestream") ||
         openLiveStreaming[0].includes("hybrid_livestreaming") ||
+        openLiveStreaming[0].includes("documentation_livestreaming") ||
+        openLiveStreaming[0].includes("events_livestreaming") ||
         openLiveStreaming[0].includes("webinar_livestreaming")) && (
           <FormField
             control={linkControl}

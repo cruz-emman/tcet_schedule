@@ -29,14 +29,14 @@ export async function LoginAccount(values: LoginSchemaType) {
             email,
             password,
     });
-        Response.json("Successfully Login!")
+         return {success: "Successfully Login! "}
     } catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {
                 case 'CredentialsSignin':
-                    Response.json(error.type)
+                    return {error: "Invalid credentials!"}
                 default:
-                    Response.json(error.type)
+                    return {error: "Invalid credentials!"}
             }
         }
         throw error;

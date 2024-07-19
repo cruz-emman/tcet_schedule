@@ -15,7 +15,7 @@ export const authRoutes = [
 ]
 
 
-export const DEFAULT_LOGIN_REDIRECT = "/"
+export const DEFAULT_LOGIN_REDIRECT = "/dashboard"
 
 //@ts-ignore
 export default auth((req) => {
@@ -56,6 +56,7 @@ export default auth((req) => {
     return null
   }
 
+  
 
   if (!isLoggedIn && !isPublicRoutes) {
     return Response.redirect(new URL('/login', nextUrl))
