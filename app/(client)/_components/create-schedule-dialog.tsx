@@ -22,7 +22,7 @@ import { CalendarIcon, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import SelectFieldInput from './select-field_input';
-import { does_have_assistance_choice, hybridChoice, photoVideoChoice, purposeChoice, trainingChoice, zoomMeetingChoice, zoomWebinarChoice } from '@/lib/data';
+import { does_have_assistance_choice, eventsChoice, hybridChoice, photoVideoChoice, purposeChoice, trainingChoice, zoomMeetingChoice, zoomWebinarChoice } from '@/lib/data';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Calendar } from '@/components/ui/calendar';
@@ -345,7 +345,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
 
                 <div className='flex flex-col  gap-2 w-full'>
 
-                <SeletGroupFieldInput
+                  <SeletGroupFieldInput
                     name="start_time"
                     placeholder="Select time"
                     control={form.control}
@@ -376,7 +376,10 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                     <FormItem>
                       <FormLabel>Venue (optional)</FormLabel>
                       <FormControl>
-                        <Input placeholder="Venue" {...field} />
+                        <Input
+                          placeholder="Venue"
+                          {...field}
+                          value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -615,6 +618,9 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                               <SelectItem value="training">
                                 Training
                               </SelectItem>
+                              <SelectItem value="events">
+                                Events
+                              </SelectItem>
                             </SelectContent>
                           </Select>
 
@@ -717,6 +723,22 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                         />
                       </>
                     )}
+
+                    {meetingType === "events" && (
+                      <>
+                        <CheckboxFieldInput
+                          control={form.control}
+                          name="meeting_type_service"
+                          data={eventsChoice}
+                          linkControl={form.control}
+                          openLiveStreaming={watchChoices}
+                          linkInputField="meeting_type_link"
+                        />
+                      </>
+                    )}
+
+
+
                   </div>
                 </div>
               </div>
@@ -761,7 +783,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                 {isPending && <div className='flex gap-x-2'>
                   Submitting...
                   <Loader2 className="animate-spin" />
-                </div> }
+                </div>}
                 {!isPending && "Submit"}
               </Button>
             </DialogClose>

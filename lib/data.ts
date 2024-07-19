@@ -131,6 +131,23 @@ export const photoVideoChoice = [
 
     id: 'documentation_Video',
     label: 'Video / Shoot'
+  },
+  {
+
+    id: 'documentation_LiveStreaming',
+    label: 'Live streaming'
+  },
+]
+export const eventsChoice = [
+  {
+
+    id: 'events_institutional',
+    label: 'Events Institutional'
+  },
+  {
+
+    id: 'events_extracurricular',
+    label: 'Events Extracurricular'
   }
 ]
 
@@ -144,6 +161,14 @@ export const trainingChoice = [
 
     id: 'training_TLC',
     label: 'TLC Training'
+  },
+  {
+    id: 'training_turnItIn',
+    label: 'TurnItIn'
+  },
+  {
+    id: 'training_others',
+    label: 'Others'
   }
 ]
 

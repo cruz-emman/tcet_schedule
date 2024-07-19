@@ -337,8 +337,10 @@ const EditAppointment = ({ params }: EditPostPageProps) => {
                       <FormItem className="w-full">
                         <FormLabel>Venue</FormLabel>
                         <FormControl>
-                          <Input placeholder="Venue" {...field} />
-                        </FormControl>
+                        <Input
+                          placeholder="Venue"
+                          {...field}
+                          value={field.value ?? ""} />                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}

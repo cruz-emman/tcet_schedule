@@ -54,7 +54,7 @@ interface Props {
 
 type OverviewTableRow = GetOverDataReponseType[0]
 
-const ActionCell = ({ row }) => {
+const ActionCell = ({ row } : any) => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const id = row.original.id;
@@ -297,6 +297,7 @@ const columns: ColumnDef<OverviewTableRow>[] = [
 
       const type = row.original.meeting_type_option
       return (
+        //@ts-ignore
         <Badge variant={type} className={cn('flex w-[120px] justify-center text-sm',)}>
          {status.label} 
         </Badge>

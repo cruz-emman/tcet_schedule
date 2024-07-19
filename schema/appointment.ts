@@ -48,7 +48,7 @@ export const CreateAppointmentSchema = z.object({
 
   //   //set 4
 
-  meeting_type_option: z.enum(['meeting', 'webinar', 'hybrid', 'documentation', 'training']),
+  meeting_type_option: z.enum(['meeting', 'webinar', 'hybrid', 'documentation', 'training', 'events']),
   meeting_type_service: z.array(z.string()).refine((value) => value.some((item) => item), {
     message: 'Please select at lease on the option'
   }),
@@ -114,7 +114,7 @@ export const CreateAppointmentSchema = z.object({
 
 
 
-    if ((meeting_type_service.includes('meeting_livestream') || meeting_type_service.includes('hybrid_livestreaming') || meeting_type_service.includes('webinar_livestreaming'))) {
+    if ((meeting_type_service.includes('meeting_livestream') || meeting_type_service.includes('hybrid_livestreaming') || meeting_type_service.includes('webinar_livestreaming') || meeting_type_service.includes('documentation_LiveStreaming'))) {
       if (!meeting_type_link) {
         ctx.addIssue({
           code: 'custom',

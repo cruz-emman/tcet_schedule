@@ -35,7 +35,9 @@ const CardWrapper = ({
     
       <CardFooter>
         <BackButton 
+            //@ts-ignore
             label={backButtonLabel}
+             //@ts-ignore
             href={backButtonHref}
         />
       </CardFooter>

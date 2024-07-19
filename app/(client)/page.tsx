@@ -19,6 +19,7 @@ const ClientDashboard = () => {
 
   const selectedDate = useQuery<GetSelectedDateResponseType>({
     queryKey: ['data', 'history', date],
+    //@ts-ignore
     queryFn: () => fetch(`/api/data-calendar?currentDate=${date.toISOString()}`).then((res) => res.json()),
     enabled: !!date,
 
