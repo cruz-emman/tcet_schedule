@@ -72,16 +72,17 @@ export const zoomWebinarChoice = [
     label: 'Practice Sessions',
   },
   {
-    id: 'webinar_reminder',
-    label: 'Reminder Email',
-  },
-  {
     id: 'webinar_poll',
     label: "Poll"
   },
   {
     id: 'webinar_QandA',
     label: 'Q&A Box'
+  },
+
+  {
+    id: 'webinar_reminder',
+    label: 'Reminder Email',
   },
   {
     id: 'webinar_panelist',
@@ -95,7 +96,7 @@ export const zoomWebinarChoice = [
     id: 'webinar_hybrid',
     label: "Hybrid"
   }
-  
+
 ]
 
 export const hybridChoice = [
@@ -179,14 +180,6 @@ export const trainingChoice = [
 
 
 export const timeAM = [
-  {
-    id: 1,
-    time: '6:00 AM'
-  },
-  {
-    id: 2,
-    time: '6:30 AM'
-  },
   {
     id: 3,
     time: '7:00 AM'
@@ -314,22 +307,6 @@ export const timePM = [
     id: 33,
     time: '10:00 PM'
   },
-  {
-    id: 34,
-    time: '10:30 PM'
-  },
-  {
-    id: 35,
-    time: '11:00 PM'
-  },
-  {
-    id: 36,
-    time: '11:30 PM'
-  },
-  {
-    id: 37,
-    time: '12:00 AM'
-  },
 ];
 
 
@@ -378,4 +355,25 @@ export const MeetingTypeOption = [
   { label: "Hybrid", value: "hybrid", badgeColor: 'bg-red-500' },
   { label: "Documentation", value: "documentation", badgeColor: 'bg-orange-500' },
   { label: "Training", value: "training", badgeColor: 'bg-emerald-500' }
+]
+
+export const departmentOptions = [
+  {label: 'CAHS', value: "CAHS"},
+  {label: 'CASE', value: "CASE"},
+  {label: 'CBMA', value: "CBMA"},
+  {label: 'CEIS', value: "CEIS"},
+  {label: 'CHTM', value: "CHTM"},
+  {label: 'CMT', value: "CMT"},
+  {label: 'SLCN', value: "SLCN"},
+  {label: 'THS', value: "THS"},
+  {label: 'AIRGEO', value: "AIRGEO"},
+  {label: 'CHAPLAIN', value: "CHAPLAIN"},
+  {label: 'TGCC', value: "TGCC"},
+  {label: 'OAR', value: "OAR"},
+  {label: 'OP', value: "OP"},
+  {label: 'OSMA', value: "OSMA"},
+  {label: 'PRPO', value: "PRPO"},
+  {label: 'SAC', value: "SAC"},
+  {label: 'URD', value: "URD"},
+  {label: 'VPAA', value: "VPAA"},
 ]

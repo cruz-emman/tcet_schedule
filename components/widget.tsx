@@ -7,7 +7,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { GetApprovedDataReturnType } from '@/app/api/widgets/approved/route';
 import { GetpendingDataReturnType } from '@/app/api/widgets/pendings/route';
 import { GetDoneDataReturnType } from '@/app/api/widgets/completed/route';
@@ -15,6 +15,8 @@ import { GetDeletedDataReturnType } from '@/app/api/widgets/cancelled-delete/rou
 import SkeletonWrapper from './skeleton-wrapper';
 
 const Widgets = () => {
+
+    const queryClient = useQueryClient()
 
     const approvedData = useQuery<GetApprovedDataReturnType>({
         queryKey: ['approved'],
@@ -35,6 +37,11 @@ const Widgets = () => {
         queryKey: ['cancel'],
         queryFn: () => fetch(`/api/widgets/cancelled-delete`).then((res) => res.json())
     })
+    
+    queryClient.invalidateQueries({
+        queryKey: ["data", "history"]
+      });
+
     
 
 

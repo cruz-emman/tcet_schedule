@@ -22,7 +22,7 @@ import { CalendarIcon, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import SelectFieldInput from './select-field_input';
-import { does_have_assistance_choice, eventsChoice, hybridChoice, photoVideoChoice, purposeChoice, trainingChoice, zoomMeetingChoice, zoomWebinarChoice } from '@/lib/data';
+import { departmentOptions, does_have_assistance_choice, eventsChoice, hybridChoice, photoVideoChoice, purposeChoice, trainingChoice, zoomMeetingChoice, zoomWebinarChoice } from '@/lib/data';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Calendar } from '@/components/ui/calendar';
@@ -183,7 +183,8 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
 
   const onSubmit = useCallback((values: CreateAppointmentSchemaType) => {
     // toast.loading("Creating Appointment...", {id: 'create-appointment'});
-    mutate(values)
+    console.log(values)
+    //mutate(values)
 
 
 
@@ -298,10 +299,21 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                   name="department"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Department</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Department" {...field} />
-                      </FormControl>
+                      <FormLabel>College / Unit</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a college / unit" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {departmentOptions.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+
+                          ))}
+                        </SelectContent>
+                      </Select>
+
                       <FormMessage />
                     </FormItem>
                   )}
@@ -466,9 +478,14 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                                       >
                                         <Calendar
                                           mode="single"
-                                          disabled={(date) =>
-                                            new Date(date) <= new Date()
-                                          } // Disable past dates and today's date
+                                          // disabled={(date) =>
+                                          //   new Date(date) <= new Date()
+                                          // } 
+                                          // Disable past dates and today's date
+                                          disabled={[
+                                            {before: new Date()},
+                                            {after: pickedDate!}
+                                          ]}
                                           selected={field.value}
                                           onSelect={field.onChange}
                                           initialFocus
