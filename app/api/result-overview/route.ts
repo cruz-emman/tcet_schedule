@@ -11,7 +11,7 @@ const getHistoryDataSchema = z.object({
 
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
+const { searchParams } = new URL(request.url)
   const timeframe = searchParams.get('timeframe')
   const year = searchParams.get("year")
   const month = searchParams.get("month")
@@ -32,7 +32,6 @@ export async function GET(request: Request) {
 
 
   try {
-
     const data = await getHistoryData(
       queryParams.data.timeframe, {
       month: queryParams.data.month,

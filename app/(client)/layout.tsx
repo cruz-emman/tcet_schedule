@@ -14,14 +14,30 @@ const LoadingFallback = () => (
 const AuthenticatedLayout = async ({ children }: { children: ReactNode }) => {
   const user = await auth()
   return (
-    <div className="relative flex h-screen w-full flex-col">
-      <Navbar user={user} />
-      <div className='flex'>
-        <div className="w-full">
-          {children}
+    <>
+      {!user ? (
+        <div className="relative flex h-screen w-full flex-col">
+          <Navbar />
+          <div className='flex'>
+            <div className="w-full">
+              {children}
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      ) : (
+        <div className="relative flex h-screen w-full flex-col">
+          <Navbar />
+          <div className='flex'>
+            <SideBar />
+            <div className="w-full">
+              {children}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+
+
   )
 }
 

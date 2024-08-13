@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Period, TimeFrame } from '@/lib/types'
 import { useQuery } from '@tanstack/react-query'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import HistoryPeriodSelector from './HistoryPeriodSelector'
 import { Badge } from '@/components/ui/badge'
 import SkeletonWrapper from '@/components/skeleton-wrapper'
@@ -17,9 +17,99 @@ import {
   YAxis
 } from 'recharts'
 import { cn } from '@/lib/utils'
+import { z } from 'zod'
+import { Button } from '@/components/ui/button'
+import { DownloadIcon } from 'lucide-react'
+import * as XLSX from 'xlsx';
+import { getDaysInMonth } from 'date-fns'
+
+
+interface DepartmentData {
+  [key: string]: number;
+}
+
+interface SampleData {
+  month: string;
+  data: {
+    [department: string]: DepartmentData;
+  };
+}
+
+const sample = {
+  "month": "August",
+  "data": {
+      "CAHS": {
+          "1": 1,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 1,
+          "6": 0,
+          "7": 0,
+          "8": 0,
+          "9": 0,
+          "10": 0,
+          "11": 0,
+          "12": 0,
+          "13": 0,
+          "14": 0,
+          "15": 0,
+          "16": 0,
+          "17": 0,
+          "18": 0,
+          "19": 0,
+          "20": 0,
+          "21": 0,
+          "22": 0,
+          "23": 0,
+          "24": 0,
+          "25": 0,
+          "26": 0,
+          "27": 0,
+          "28": 0,
+          "29": 0,
+          "30": 0,
+          "31": 0
+      },
+      "CASE": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0,
+          "6": 0,
+          "7": 0,
+          "8": 0,
+          "9": 0,
+          "10": 0,
+          "11": 0,
+          "12": 0,
+          "13": 0,
+          "14": 0,
+          "15": 0,
+          "16": 0,
+          "17": 0,
+          "18": 0,
+          "19": 0,
+          "20": 0,
+          "21": 0,
+          "22": 0,
+          "23": 0,
+          "24": 0,
+          "25": 0,
+          "26": 0,
+          "27": 0,
+          "28": 0,
+          "29": 0,
+          "30": 0,
+          "31": 0
+      },
+    }
+}
 
 const History = () => {
   const [timeFrame, setTimeFrame] = useState<TimeFrame>('month')
+
   const [period, setPeriod] = useState<Period>({
     month: new Date().getMonth(),
     year: new Date().getFullYear()
@@ -35,17 +125,86 @@ const History = () => {
         pending: item.counts.pending,
         approved: item.counts.approved,
         done: item.counts.done,
-        cancel: item.counts.cancel
+        cancel: item.counts.cancel,
+
       })))
   });
 
+
+
+
+  const zoomDataQuery = useQuery({
+    queryKey: ['zoom', timeFrame, period],
+    queryFn: () => fetch(`/api/export-csv?timeframe=${timeFrame}&year=${period.year}&month=${period.month}`)
+      .then((res) => res.json())
+  })
+
+
   const dataAvailable = historyDataQuery.data && historyDataQuery.data.length > 0;
 
+  const handleExportExcel = () => {
+    const data = zoomDataQuery.data.data;
+    const month = zoomDataQuery.data.month;
+    
+
+
+    // Get the departments
+    const departments = Object.keys(data);
+    
+    // Get the number of days in the month
+    const daysInMonth = Object.keys(data[departments[0]]).length;
+
+    // Create the header row
+    const header: (string | number)[] = ["Department", ...Array.from({length: daysInMonth}, (_, i) => i + 1), "Department Total"];
+    
+    // Create the rows for each department
+    const rows: (string | number)[][] = departments.map(dept => {
+      const row: (string | number)[] = [dept];
+      let deptTotal = 0;
+      
+      for (let i = 1; i <= daysInMonth; i++) {
+        const value = data[dept][i.toString()] || 0;
+        row.push(value);
+        deptTotal += value;
+      }
+      
+      row.push(deptTotal);
+      return row;
+    });
+    
+    // Create a new workbook and worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
+    
+    // Set column widths
+    const colWidth = 5;
+    const firstColWidth = 15;
+    const lastColWidth = 20;
+    ws['!cols'] = [
+      { wch: firstColWidth },
+      ...Array(daysInMonth).fill({ wch: colWidth }),
+      { wch: lastColWidth }
+    ];
+    
+    // Append the worksheet to the workbook
+    XLSX.utils.book_append_sheet(wb, ws, "Departments");
+    
+    // Export the Excel file
+    XLSX.writeFile(wb, `${month}_DEPARTMENT_REPORT.xlsx`);
+  };
 
 
   return (
     <div className='container'>
       <h2 className='mt-12 text-3xl font-bold'>History</h2>
+      <Button
+        variant={"outline"} size={"sm"} className='ml-auto h-8 lg:flex' 
+        onClick={handleExportExcel}
+        >
+        <DownloadIcon className='mr-2 h-4 w-4'
+        />
+        Export1
+      </Button>
       <Card className='col-span-12 mt-2 w-full'>
         <CardHeader className='gap-2'>
           <CardTitle className='flex justify-between'>
@@ -57,7 +216,7 @@ const History = () => {
             />
             <div className="flex h-10 gap-2">
               <Badge variant="outline" className="flex items-center gap-2 text-sm">
-                <div className="h-4 w-4 rounded-full bg-blue-500"></div>
+                <div className="h-4 w-4 rounded-full bg-yellow-500"></div>
                 Pending
               </Badge>
               <Badge variant="outline" className="flex items-center gap-2 text-sm">
@@ -65,7 +224,7 @@ const History = () => {
                 Approved
               </Badge>
               <Badge variant="outline" className="flex items-center gap-2 text-sm">
-                <div className="h-4 w-4 rounded-full bg-yellow-500"></div>
+                <div className="h-4 w-4 rounded-full bg-blue-500"></div>
                 Done
               </Badge>
               <Badge variant="outline" className="flex items-center gap-2 text-sm">
@@ -87,7 +246,7 @@ const History = () => {
                       padding={{ left: 5, right: 5 }}
                       dataKey={(data) => {
                         const { year, month, day } = data;
-                        const date = new Date(year, month, day || 1);
+                        const date = new Date(year, month, day || 0);
                         if (timeFrame === "year") {
                           return date.toLocaleDateString("default", {
                             month: "short",
@@ -105,9 +264,9 @@ const History = () => {
                       tickLine={false}
                       axisLine={false}
                     />
-                    <Bar dataKey="pending" fill="#3b82f6" />
+                    <Bar dataKey="pending" fill="#eab308" />
                     <Bar dataKey="approved" fill="#10b981" />
-                    <Bar dataKey="done" fill="#f59e0b" />
+                    <Bar dataKey="done" fill="#3b82f6" />
                     <Bar dataKey="cancel" fill="#ef4444" />
 
                     <Tooltip

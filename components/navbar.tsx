@@ -11,20 +11,20 @@ import { ThemeSwitcherBtn } from './theme/theme-switcher-btn'
 import { NavbarLinks } from '@/lib/data'
 import { SideBar } from './sidebar'
 
-export default function Navbar({user}: any) {
+export default function Navbar() {
 
 
     return (
         <>
-            <DesktopNavbar user={user} />
-            <MobileNavbar user={user} />
+            <DesktopNavbar  />
+            <MobileNavbar />
         </>
     )
 }
 
 
 
-function MobileNavbar({user}:any) {
+function MobileNavbar() {
     const [isOpen, setIsOpen] = useState(false)
 
     return (
@@ -62,7 +62,7 @@ function MobileNavbar({user}:any) {
     )
 }
 
-function DesktopNavbar({user}:any) {
+function DesktopNavbar() {
     
     
     
@@ -70,9 +70,7 @@ function DesktopNavbar({user}:any) {
         <div className='hidden border-seperate border-b bg-background md:block'>
             <nav className="container flex items-center justify-between mx-auto">
                 <div className='flex h-[60px] min-h-[60px] items-center gap-x-4'>
-                    {user && (
-                        <SideBar />
-                    )}
+                  
                     <div className='flex h-full'>
 
                     </div>

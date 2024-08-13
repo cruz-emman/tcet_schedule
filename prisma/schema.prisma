@@ -57,10 +57,12 @@ model Appointment {
   dry_run_start_time   String?
   dry_run_end_time     String?
   does_have_assistance String
-  name_of_assistance   String?
+  name_of_assistance   Json?
 
   meeting_type_option  String?
   meeting_type_service String?
+  reminder             String?
+  panelist             Json?
   meeting_type_link    String?
   camera_setup         String?
   status               String

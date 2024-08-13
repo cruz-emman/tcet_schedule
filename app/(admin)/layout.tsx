@@ -1,3 +1,5 @@
+
+
 import { auth } from '@/auth'
 import Navbar from '@/components/navbar'
 import { SideBar } from '@/components/sidebar'
@@ -14,14 +16,15 @@ const LoadingFallback = () => (
 const AuthenticatedLayout = async ({ children }: { children: ReactNode }) => {
   const user = await auth()
   return (
-    <div className="relative flex h-screen w-full flex-col">
-      <Navbar user={user} />
-      <div className='flex'>
-        <div className="w-full">
-          {children}
-        </div>
+    <div className="flex h-screen w-full flex-col">
+    <Navbar />   
+    <div className='flex flex-1 '>
+      <SideBar />
+      <div className="flex-1 overflow-auto">
+        {children}
       </div>
     </div>
+  </div>
   )
 }
 

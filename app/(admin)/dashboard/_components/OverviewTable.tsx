@@ -363,14 +363,13 @@ const OverviewTable = ({ from, to }: Props) => {
 
 
 
+
   const table = useReactTable({
     data: history.data || emptyData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     initialState: {
-      pagination: {
-        pageSize: 2
-      }
+
     },
     state: {
       sorting,
@@ -399,18 +398,7 @@ const OverviewTable = ({ from, to }: Props) => {
         </div>
         <div className='flex flex-wrap gap-2'>
           <DataTableViewOptions table={table} />
-          <Button variant={"outline"} size={"sm"} className='ml-auto h-8 lg:flex' onClick={() => {
-            const data = table.getFilteredRowModel().rows.map(row => ({
-              title: row.original.title,
-              email: row.original.email,
-              requestedBy: row.original.fullname,
-              contact_person: row.original.contact_person,
-              approved: row.original.user,
-              type: row.original.meeting_type_option,
-              date: row.original.event_date
-            }));
-            handleExportCsv(data)
-          }}>
+          <Button variant={"outline"} size={"sm"} className='ml-auto h-8 lg:flex' >
             <DownloadIcon className='mr-2 h-4 w-4' />
             Export CSV
           </Button>

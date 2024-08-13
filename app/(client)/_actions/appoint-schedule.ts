@@ -1,5 +1,6 @@
 'use server'
 import { db } from "@/lib/db"
+import { DateToUTCDate } from "@/lib/helpers"
 import { CreateAppointmentSchema, CreateAppointmentSchemaType } from "@/schema/appointment"
 import * as postmark from "postmark"
 
@@ -28,6 +29,9 @@ export async function CreateAppointment(form: CreateAppointmentSchemaType) {
         //set 4
         meeting_type_option,
         meeting_type_service,
+        reminder,
+        panelist,
+        
         meeting_type_link,
         camera_setup,
         status
@@ -35,6 +39,11 @@ export async function CreateAppointment(form: CreateAppointmentSchemaType) {
 
     const tcet_assistance = does_have_assistance.join()
     const meeting_service = meeting_type_service.join()
+    const event_actual_date = DateToUTCDate(event_date)
+    
+    const currentReminder = reminder ? reminder.join(',') : null
+
+ 
 
     await db.$transaction(async (prisma) => {
         const appointment = await prisma.appointment.create({
@@ -57,7 +66,9 @@ export async function CreateAppointment(form: CreateAppointmentSchemaType) {
 
                 //set 4
                 meeting_type_option,
-                meeting_type_service: meeting_service,
+                meeting_type_service: meeting_service,    
+                reminder: currentReminder,
+                panelist,
                 meeting_type_link,
                 camera_setup,
                 status
@@ -73,31 +84,31 @@ export async function CreateAppointment(form: CreateAppointmentSchemaType) {
             }
         })
 
-        await client.sendEmail({
-            "From": "support@tcet.tualearning.com",
-            "To": email,
-            "Subject": "Appointment Confirmation",
-            "TextBody": `
+        // await client.sendEmail({
+        //     "From": "support@tcet.tualearning.com",
+        //     "To": email,
+        //     "Subject": "Appointment Confirmation",
+        //     "TextBody": `
 
-                Dear ${fullname},
+        //         Dear ${fullname},
 
-                Your appointment has been confirmed with the following details:
+        //         Your appointment has been confirmed with the following details:
 
-                Title: ${title}
-                Date: ${event_date.toDateString()}
-                Time: ${start_time} - ${end_time}
-                Purpose: ${purpose}
+        //         Title: ${title}
+        //         Date: ${event_date.toDateString()}
+        //         Time: ${start_time} - ${end_time}
+        //         Purpose: ${purpose}
 
-                Thank you for using our service.
+        //         Thank you for using our service.
 
-                Best regards,
-                Your Appointment Team
+        //         Best regards,
+        //         Your Appointment Team
 
-                if you encounter any problem or conercn, please email tcet@tua.edu.ph
-            `,
-            "MessageStream": "outbound",
+        //         if you encounter any problem or conercn, please email tcet@tua.edu.ph
+        //     `,
+        //     "MessageStream": "outbound",
 
-        },)
+        // },)
     }, {
         timeout: 15000
     })

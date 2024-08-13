@@ -9,31 +9,39 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
 import { CreateAppointmentSchema, CreateAppointmentSchemaType } from '@/schema/appointment';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { UpdateAppointment } from './_actions/update-appointment';
-import { does_have_assistance_choice, hybridChoice, photoVideoChoice, purposeChoice, trainingChoice, zoomMeetingChoice, zoomWebinarChoice } from '@/lib/data';
+import { departmentOptions, does_have_assistance_choice, hybridChoice, photoVideoChoice, purposeChoice, trainingChoice, zoomMeetingChoice, zoomWebinarChoice } from '@/lib/data';
 import SeletGroupFieldInput from '@/components/forms/select-time';
 import SelectFieldInput from '@/components/forms/select-field_input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { format, isBefore, startOfDay } from 'date-fns';
-import { ArrowBigLeft, CalendarIcon, Loader2 } from 'lucide-react';
+import { ArrowBigLeft, CalendarIcon, Loader2, Plus, Trash2 } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import CheckboxFieldInput from '@/components/forms/check-field-input';
-import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Link from 'next/link';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AdditionalField from './_components/additional_field';
+
 
 
 interface EditPostPageProps {
@@ -42,13 +50,37 @@ interface EditPostPageProps {
   };
 }
 
+interface Assistant {
+  name: string;
+  email: string;
+}
+
+type MeetingType = 'meeting' | 'webinar' | 'hybrid' | 'documentation' | 'training';
+
 
 
 
 const EditAppointment = ({ params }: EditPostPageProps) => {
 
+
   const { id } = params;
   const router = useRouter()
+
+  const [assistants, setAssistants] = useState<Assistant[]>([]);
+  const [panelists, setPanelist] = useState<any>([])
+  const [newAssistant, setNewAssistant] = useState({ name: '', email: '' });
+  const [newPanelist, setNewPanelist] = useState({ name: '', email: '' });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalPanelist ,setIsModalPanelist] = useState(false)
+
+  const [meetingTypeSelections, setMeetingTypeSelections] = useState<Record<MeetingType, never[]>>({
+    meeting: [],
+    webinar: [],
+    hybrid: [],
+    documentation: [],
+    training: []
+  });
+
 
 
 
@@ -59,38 +91,52 @@ const EditAppointment = ({ params }: EditPostPageProps) => {
   })
 
 
-  const { data } = appoinment
+
+  const { data, isLoading, error } = appoinment;
 
   const form = useForm<CreateAppointmentSchemaType>({
     resolver: zodResolver(CreateAppointmentSchema),
     defaultValues: {
-      does_have_assistance: [],
-      meeting_type_service: [],
-    }
+    },
   });
+
+  let watchEvent = form.watch("meeting_type_option");
+  let watchDoesHaveAssitance = form.watch('does_have_assistance')
+  let watchMeetingTypeService = form.watch('meeting_type_service')
+
+
 
   useEffect(() => {
     if (data) {
       form.reset({
-        title: data.title,
-        email: data.email,
-        fullname: data.fullname,
-        contact_person: data.contact_person,
-        department: data.department,
-        event_date: new Date(data.event_date),
-        purpose: data.purpose,
-        venue: data.venue,
-        does_have_dry_run: data.does_have_dry_run,
         does_have_assistance: data.does_have_assistance?.split(",") || [],
-        name_of_assistance: data.name_of_assistance,
-        meeting_type_option: data.meeting_type_option,
         meeting_type_service: data.meeting_type_service?.split(",") || [],
-        meeting_type_link: data.meeting_type_link,
-        camera_setup: data.camera_setup || "",
-        status: data.status
+        reminder: data.reminder?.split(',') || [],
+        meeting_type_option: data.meeting_type_option,
+      });
+      // Initialize meeting type selections with fetched data
+      setMeetingTypeSelections({
+        meeting: data.meeting_type_option === 'meeting' ? data.meeting_type_service?.split(",") || [] : [],
+        webinar: data.meeting_type_option === 'webinar' ? data.meeting_type_service?.split(",") || [] : [],
+        hybrid: data.meeting_type_option === 'hybrid' ? data.meeting_type_service?.split(",") || [] : [],
+        documentation: data.meeting_type_option === 'documentation' ? data.meeting_type_service?.split(",") || [] : [],
+        training: data.meeting_type_option === 'training' ? data.meeting_type_service?.split(",") || [] : []
       });
     }
+    if (data?.name_of_assistance) {
+      setAssistants(data.name_of_assistance);
+    }
+    if (data?.panelist) {
+      setPanelist(data.panelist);
+    }
   }, [data, form]);
+
+
+
+
+
+
+
 
   const queryClient = useQueryClient()
 
@@ -113,6 +159,7 @@ const EditAppointment = ({ params }: EditPostPageProps) => {
   })
 
 
+
   //LOGIC FOR THE DATAS 
   const handleClick = () => {
     form.setValue("dry_run_date", undefined);
@@ -121,251 +168,303 @@ const EditAppointment = ({ params }: EditPostPageProps) => {
   };
 
   const handleMeetingTypeChange = (newMeetingType: any) => {
+    // Save the current meeting type service selections
+    const currentMeetingType = form.getValues("meeting_type_option") as MeetingType;
+    const currentMeetingTypeService = form.getValues("meeting_type_service");
+
+
+    setMeetingTypeSelections(prev => ({
+      ...prev,
+      [currentMeetingType]: currentMeetingTypeService
+    }));
+
+    // Set new meeting type and reset services for new type
     form.setValue("meeting_type_option", newMeetingType);
-    form.setValue("meeting_type_service", []);
-    form.setValue("camera_setup", "")
+    //@ts-ignore
+    form.setValue("meeting_type_service", meetingTypeSelections[newMeetingType] || []);
+    form.setValue("camera_setup", "");
     form.resetField("meeting_type_link");
     form.resetField("camera_setup");
   };
 
 
-  let watchEvent = form.watch("meeting_type_option");
 
 
-  const onEdit = (values: CreateAppointmentSchemaType) => {
-    console.log(values)
-    mutate({ form: values, id: params.id });
+  useEffect(() => {
+    form.setValue('name_of_assistance', assistants);
+  }, [assistants, form]);
+
+
+  useEffect(() => {
+    form.setValue('panelist', panelists)
+  }, [panelists, form])
+
+
+
+  //For Panelist
+  const removePanelist = (name: string) => {
+    setPanelist((prev:any) => prev.filter((panel: {name: string}) => panel.name !==name))
   }
 
-  const onError = (error: any) => {
-    console.log(error);
+
+  const addPanelist = () => {
+    if (newPanelist.name && newPanelist.email) {
+      setPanelist((prev: any) => [...prev, newPanelist])
+      setNewPanelist({ name: '', email: '' })
+    }
+  }
+
+
+
+  //For Assistant
+  const removeAssistant = (name: string) => {
+    setAssistants((prev) => prev.filter((assistant: { name: string }) => assistant.name !== name));
   };
 
 
-  if (appoinment.isLoading) {
-    return <div>
-      Loading...
-    </div>
+  const addAssistant = () => {
+    if (newAssistant.name && newAssistant.email) {
+      setAssistants((prev) => [...prev, newAssistant]);
+      setNewAssistant({ name: '', email: '' }); // Reset the form
+    }
+  };
+
+
+  //For submitting actual form
+  const onEdit = (values: CreateAppointmentSchemaType) => {
+    const formData = {
+      ...values,
+      name_of_assistance: assistants,
+      panelist: panelists
+    };
+    console.log(formData)
+    mutate({ form: formData, id: params.id });
+  }
+  const onError = (error: any) => {
+    console.log(error)
+
+  };
+
+  if(isLoading){
+    return (
+      <div>
+        Loading...
+      </div>
+    )
   }
 
+
   return (
-    <>
-      <Button asChild className='my-2' size="sm">
+
+    <div className='m-4 p-4 shadow-2xl border-2  '>
+    <Button asChild className='my-2' size="sm">
         <Link href="/dashboard">
           <ArrowBigLeft />
           Back
         </Link>
       </Button>
-      <SkeletonWrapper isLoading={appoinment.isFetching}>
+      <SkeletonWrapper isLoading={appoinment.isLoading}>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onEdit, onError)}
-            className='mx-4 flex flex-col gap-y-2'
-          >
-
-           <div className='flex flex-col'>
-           <p className="text-xl font-semibold">General Information</p>
-           
-           </div>
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Event Title" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="w-full flex flex-col ">
-              <div className="flex flex-row gap-x-2">
-                <div className="flex flex-1 ">
-                  <FormField
-                    control={form.control}
-                    name="fullname"
-
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel>Full Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Full Name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="flex flex-1 ">
-                  <FormField
-                    control={form.control}
-                    name="contact_person"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel>Contact Person</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Contact Person" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-row gap-x-2">
-                <div className="flex flex-1 ">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="flex flex-1 ">
-                  <FormField
-                    control={form.control}
-                    name="department"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel>Department</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Department" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-
-              <div className="flex flex-col gap-y-2 w-full">
-                <p className="text-xl font-semibold">Purpose, Date , and Time</p>
-
-                <div className="flex flex-col md:flex-row  md:items-center md:justify-center gap-x-2">
-
-
-                  <FormField
-                    control={form.control}
-                    name="event_date"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col md:justify-center md:items-center">
-                        <FormLabel>Event Date</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant={"outline"}
-                                className={cn(
-                                  "w-[240px] pl-3 text-left font-normal",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                              >
-                                {field.value ? (
-                                  format(field.value, "PPP")
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={(date) => isBefore(new Date(date), startOfDay(new Date()))}
-
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+          <form>
+            <div className='flex flex-col gap-4'>
               
-                  <SeletGroupFieldInput
-                    name="start_time"
-                    defaultValue={data?.start_time}
-                    placeholder="start of event.."
-                    control={form.control}
-                    label="Start"
-                    className={`w-40`}
-                  />
-
-                  <SeletGroupFieldInput
-                    name="end_time"
-                    defaultValue={data?.end_time}
-
-                    placeholder="end of event.."
-                    control={form.control}
-                    label="End"
-                    className={`w-40`}
-                  />
-
-                  <SelectFieldInput
-                    control={form.control}
-                    defaultValue={data?.purpose}
-
-                    name="purpose"
-                    label="Purpose"
-                    placeholder="select a purpose"
-                    data={purposeChoice}
-                    className={`w-full`}
-                  />
-
-                  
-                </div>
+              {/* General Information */}
+              <div className='flex flex-col gap-y-2 '>
+                <p className='text-lg text-gray-400 font-semibold'>General Information</p>
                 <FormField
-                    control={form.control}
-                    name="venue"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel>Venue</FormLabel>
+                  control={form.control}
+                  name="title"
+                  defaultValue={data?.title}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  defaultValue={data?.email}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="fullname"
+                  defaultValue={data?.fullname}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="contact_person"
+                  defaultValue={data?.contact_person}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Contact Person</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form?.control}
+                  name="department"
+                  defaultValue={data?.department}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>College / Unit</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a college / unit" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {departmentOptions.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+
+              {/* Date, Time and Purpose */}
+
+              <div className='flex flex-col gap-y-2 bg-gray-100'>
+                <p className='text-lg text-gray-400 font-semibold'>Date, Time and Purpose</p>
+
+                <FormField
+                  control={form.control}
+                  name="event_date"
+                  defaultValue={data?.event_date}
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Date of Event</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              disabled
+                              variant={"outline"}
+                              className={cn(
+                                "w-[240px] pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) => isBefore(new Date(date), startOfDay(new Date()))}
+
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <SeletGroupFieldInput
+                  name="start_time"
+                  defaultValue={data?.start_time}
+                  placeholder="start of event.."
+                  control={form.control}
+                  label="Start"
+                />
+
+                <SeletGroupFieldInput
+                  name="end_time"
+                  defaultValue={data?.end_time}
+                  placeholder="end of event.."
+                  control={form.control}
+                  label="End"
+
+                />
+
+                <SelectFieldInput
+                  control={form.control}
+                  defaultValue={data?.purpose}
+                  name="purpose"
+                  label="Purpose"
+                  placeholder="select a purpose"
+                  data={purposeChoice}
+                  className={`w-full`}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="venue"
+                  defaultValue={data?.venue || ""}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Venue (optional)</FormLabel>
+                      <FormControl>
                         <Input
                           placeholder="Venue"
                           {...field}
-                          value={field.value ?? ""} />                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                          value={field.value ?? ""} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
-              <div className='flex flex-col gap-y-2 w-full'>
-                <p className='text-xl font-semibold'>(Optional) Preferred Meeting Date / Dry Run</p>
+              {/* Dry Run and Assistance */}
+              <div className='flex flex-col gap-y-2 bg-gray-100'>
+                <p className='text-lg text-gray-400 font-semibold'>Dry Run and Assistance</p>
                 <FormField
                   control={form.control}
                   name="does_have_dry_run"
                   defaultValue={data?.does_have_dry_run}
                   render={({ field }) => (
                     <FormItem className="space-y-3">
-
+                      <FormLabel>Dry Run</FormLabel>
                       <FormControl>
                         <RadioGroup
-                           onValueChange={(value) => {
+                          onValueChange={(value) => {
                             const boolValue = value === "true";
                             field.onChange(boolValue);
                             if (!boolValue) {
                               handleClick();
                             }
                           }}
-                        
+
                           defaultValue={String(field.value)}
                           className="flex flex-col space-y-1"
                         >
@@ -397,7 +496,7 @@ const EditAppointment = ({ params }: EditPostPageProps) => {
                             <div className="flex flex-col gap-2">
                               <FormField
                                 control={form.control}
-                                defaultValue={form.watch('dry_run_date') || data?.dry_run_date}
+                                defaultValue={data?.dry_run_date || null}
                                 name="dry_run_date"
                                 render={({ field }) => (
                                   <FormItem className="flex flex-col">
@@ -462,7 +561,6 @@ const EditAppointment = ({ params }: EditPostPageProps) => {
                           </div>
                         </FormItem>
                       )}
-
                       <FormMessage />
                     </FormItem>
                   )}
@@ -520,359 +618,486 @@ const EditAppointment = ({ params }: EditPostPageProps) => {
                     </FormItem>
                   )}
                 />
-                {form.watch('does_have_assistance').includes('others') && (
-                  <FormField
-                    control={form.control}
-                    name="name_of_assistance"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Other Assistance</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="please type the other assitance"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+
+                {watchDoesHaveAssitance?.includes('others') && (
+                  <Table className='max-w-[400px]'>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>
+                          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                            <DialogTrigger asChild>
+                              <Button variant="outline">Add</Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px]">
+                              <DialogHeader>
+                                <DialogTitle>Add New Assistant</DialogTitle>
+                              </DialogHeader>
+                              <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label htmlFor="name" className="text-right">
+                                    Name
+                                  </Label>
+                                  <Input
+                                    id="name"
+                                    value={newAssistant.name}
+                                    onChange={(e) => setNewAssistant({ ...newAssistant, name: e.target.value })}
+                                    className="col-span-3"
+                                  />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label htmlFor="email" className="text-right">
+                                    Email
+                                  </Label>
+                                  <Input
+                                    id="email"
+                                    type="email"
+                                    value={newAssistant.email}
+                                    onChange={(e) => setNewAssistant({ ...newAssistant, email: e.target.value })}
+                                    className="col-span-3"
+                                  />
+                                </div>
+                              </div>
+                              <Button onClick={addAssistant}>Add Assistant</Button>
+                            </DialogContent>
+                          </Dialog>
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {assistants.map((item: { name: string, email: string }) => (
+                        <TableRow key={item.name}>
+                          <TableCell>{item.name}</TableCell>
+                          <TableCell>{item.email}</TableCell>
+                          <TableCell>
+                            <Button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                removeAssistant(item.name);
+                              }}
+                              variant="ghost"
+                            >
+                              <Trash2
+                                className='h-4 w-4 text-red-700'
+
+                              />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 )}
+
 
               </div>
 
-              <div className='flex flex-col gap-y-2 w-full'>
-                <div className='flex gap-2'>
+              {/* Type of Service */}
 
+              <div className='flex flex-col gap-y-2 bg-gray-100'>
+                <p className='text-lg text-gray-400 font-semibold'>Type Of Service</p>
+                <FormField
+                  control={form.control}
+                  name="meeting_type_option"
+                  defaultValue={data?.meeting_type_option}
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Type of Service</FormLabel>
+                      <Select
+                        onValueChange={(value) =>
+                          handleMeetingTypeChange(value)
+                        }
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a meeting type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="meeting">
+                            Zoom Meeting
+                          </SelectItem>
+                          <SelectItem value="webinar">
+                            Zoom Webinar
+                          </SelectItem>
+                          <SelectItem value="hybrid">Hybrid</SelectItem>
+                          <SelectItem value="documentation">
+                            Documentation
+                          </SelectItem>
+                          <SelectItem value="training">
+                            Training
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
 
-                  <div className="flex flex-col gap-y-2 flex-1 ">
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {watchEvent === "documentation" && (
+                  <>
                     <FormField
                       control={form.control}
-                      name="meeting_type_option"
-                      defaultValue={data?.meeting_type_option}
-                      render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormLabel>Type of Service</FormLabel>
-                          <Select
-                            onValueChange={(value) =>
-                              handleMeetingTypeChange(value)
-                            }
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select a meeting type" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="meeting">
-                                Zoom Meeting
-                              </SelectItem>
-                              <SelectItem value="webinar">
-                                Zoom Webinar
-                              </SelectItem>
-                              <SelectItem value="hybrid">Hybrid</SelectItem>
-                              <SelectItem value="documentation">
-                                Documentation
-                              </SelectItem>
-                              <SelectItem value="training">
-                                Training
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
+                      name="meeting_type_service"
+                      render={() => (
+                        <FormItem>
+                          {photoVideoChoice.map((item) => (
+                            <FormField
+                              key={item.id}
+                              control={form.control}
+                              name="meeting_type_service"
+                              render={({ field }) => {
+                                return (
+                                  <FormItem
+                                    key={item.id}
+                                    className="flex flex-row items-start space-x-3 space-y-0"
+                                  >
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value?.includes(item.id)}
+                                        onCheckedChange={(checked) => {
+                                          return checked
+                                            ? field.onChange([
+                                              ...field.value,
+                                              item.id,
+                                            ])
+                                            : field.onChange(
+                                              field.value?.filter(
+                                                (value) => value !== item.id
+                                              )
+                                            );
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">
+                                      {item.label}
+                                    </FormLabel>
+                                  </FormItem>
+                                );
+                              }}
+                            />
+                          ))}
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
 
+                {watchEvent === "meeting" && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="meeting_type_service"
+                      render={({ field }) => (
+                        <FormItem>
+                          {zoomMeetingChoice.map((item) => (
+                            <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(item.id)}
+                                  onCheckedChange={(checked) => {
+                                    const updatedValue = checked
+                                      ? [...(field.value || []), item.id]
+                                      : (field.value || []).filter((value) => value !== item.id);
+                                    field.onChange(updatedValue);
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="font-normal">{item.label}</FormLabel>
+                            </FormItem>
+                          ))}
                           <FormMessage />
                         </FormItem>
                       )}
                     />
 
-                    {watchEvent === "meeting" && (
-                      <>
-                        <FormField
-                          control={form.control}
-                          name="meeting_type_service"
-                          render={({ field }) => (
-                            <FormItem>
-                              {zoomMeetingChoice.map((item) => (
-                                <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(item.id)}
-                                      onCheckedChange={(checked) => {
-                                        const updatedValue = checked
-                                          ? [...(field.value || []), item.id]
-                                          : (field.value || []).filter((value) => value !== item.id);
-                                        field.onChange(updatedValue);
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="font-normal">{item.label}</FormLabel>
-                                </FormItem>
-                              ))}
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </>
-                    )}
+                    <AdditionalField
+                      defaultValues={data}
+                      control={form.control}
+                      dataServices={watchMeetingTypeService}
 
-                    {watchEvent === "webinar" && (
-                      <>
-                        <FormField
-                          control={form.control}
-                          name="meeting_type_service"
-                          render={() => (
-                            <FormItem>
-                              {zoomWebinarChoice.map((item) => (
-                                <FormField
-                                  key={item.id}
-                                  control={form.control}
-                                  name="meeting_type_service"
-                                  render={({ field }) => {
-                                    return (
-                                      <FormItem
-                                        key={item.id}
-                                        className="flex flex-row items-start space-x-3 space-y-0"
-                                      >
-                                        <FormControl>
-                                          <Checkbox
-                                            checked={field.value?.includes(item.id)}
-                                            onCheckedChange={(checked) => {
-                                              return checked
-                                                ? field.onChange([
-                                                  ...field.value,
-                                                  item.id,
-                                                ])
-                                                : field.onChange(
-                                                  field.value?.filter(
-                                                    (value) => value !== item.id
-                                                  )
-                                                );
-                                            }}
-                                          />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                          {item.label}
-                                        </FormLabel>
-                                      </FormItem>
-                                    );
-                                  }}
-                                />
-                              ))}
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </>
-                    )}
+                    />
+                  </>
+                )}
 
-                    {watchEvent === "hybrid" && (
-                      <>
-                        <FormField
-                          control={form.control}
-                          name="meeting_type_service"
-                          render={() => (
-                            <FormItem>
-                              {hybridChoice.map((item) => (
-                                <FormField
-                                  key={item.id}
-                                  control={form.control}
-                                  name="meeting_type_service"
-                                  render={({ field }) => {
-                                    return (
-                                      <FormItem
-                                        key={item.id}
-                                        className="flex flex-row items-start space-x-3 space-y-0"
-                                      >
-                                        <FormControl>
-                                          <Checkbox
-                                            checked={field.value?.includes(item.id)}
-                                            onCheckedChange={(checked) => {
-                                              return checked
-                                                ? field.onChange([
-                                                  ...field.value,
-                                                  item.id,
-                                                ])
-                                                : field.onChange(
-                                                  field.value?.filter(
-                                                    (value) => value !== item.id
-                                                  )
-                                                );
-                                            }}
-                                          />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                          {item.label}
-                                        </FormLabel>
-                                      </FormItem>
-                                    );
-                                  }}
-                                />
-                              ))}
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="camera_setup"
-                          render={({ field }) => (
-                            <FormItem className="space-y-3">
-                              <FormLabel>Camera Setup</FormLabel>
-                              <FormControl>
-                                <RadioGroup
-                                  onValueChange={field.onChange}
-                                  defaultValue={field.value}
-                                  className="flex flex-col space-y-1"
-                                >
-                                  <FormItem className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
-                                      <RadioGroupItem value="oneCamera" />
-                                    </FormControl>
-                                    <FormLabel>1 Camera set-up</FormLabel>
-                                  </FormItem>
-                                  <FormItem className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
-                                      <RadioGroupItem value="twoCamera" />
-                                    </FormControl>
-                                    <FormLabel>2 Camera set-up</FormLabel>
-                                  </FormItem>
-                                </RadioGroup>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </>
-                    )}
-
-                    {watchEvent === "documentation" && (
-                      <>
-                        <FormField
-                          control={form.control}
-                          name="meeting_type_service"
-                          render={() => (
-                            <FormItem>
-                              {photoVideoChoice.map((item) => (
-                                <FormField
-                                  key={item.id}
-                                  control={form.control}
-                                  name="meeting_type_service"
-                                  render={({ field }) => {
-                                    return (
-                                      <FormItem
-                                        key={item.id}
-                                        className="flex flex-row items-start space-x-3 space-y-0"
-                                      >
-                                        <FormControl>
-                                          <Checkbox
-                                            checked={field.value?.includes(item.id)}
-                                            onCheckedChange={(checked) => {
-                                              return checked
-                                                ? field.onChange([
-                                                  ...field.value,
-                                                  item.id,
-                                                ])
-                                                : field.onChange(
-                                                  field.value?.filter(
-                                                    (value) => value !== item.id
-                                                  )
-                                                );
-                                            }}
-                                          />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                          {item.label}
-                                        </FormLabel>
-                                      </FormItem>
-                                    );
-                                  }}
-                                />
-                              ))}
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </>
-                    )}
-                    {watchEvent === "training" && (
-                      <>
-                        <FormField
-                          control={form.control}
-                          name="meeting_type_service"
-                          render={() => (
-                            <FormItem>
-                              {trainingChoice.map((item) => (
-                                <FormField
-                                  key={item.id}
-                                  control={form.control}
-                                  name="meeting_type_service"
-                                  render={({ field }) => {
-                                    return (
-                                      <FormItem
-                                        key={item.id}
-                                        className="flex flex-row items-start space-x-3 space-y-0"
-                                      >
-                                        <FormControl>
-                                          <Checkbox
-                                            checked={field.value?.includes(item.id)}
-                                            onCheckedChange={(checked) => {
-                                              return checked
-                                                ? field.onChange([
-                                                  ...field.value,
-                                                  item.id,
-                                                ])
-                                                : field.onChange(
-                                                  field.value?.filter(
-                                                    (value) => value !== item.id
-                                                  )
-                                                );
-                                            }}
-                                          />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                          {item.label}
-                                        </FormLabel>
-                                      </FormItem>
-                                    );
-                                  }}
-                                />
-                              ))}
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </>
-                    )}
+                {watchEvent === "webinar" && (
+                  <>
                     <FormField
                       control={form.control}
-                      name="meeting_type_link"
+                      name="meeting_type_service"
+                      render={() => (
+                        <FormItem>
+                          {zoomWebinarChoice.map((item) => (
+                            <FormField
+                              key={item.id}
+                              control={form.control}
+                              name="meeting_type_service"
+                              render={({ field }) => {
+                                return (
+                                  <FormItem
+                                    key={item.id}
+                                    className="flex flex-row items-start space-x-3 space-y-0"
+                                  >
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value?.includes(item.id)}
+                                        onCheckedChange={(checked) => {
+                                          const updatedValue = checked
+                                            ? [...(field.value || []), item.id]
+                                            : (field.value || []).filter((value) => value !== item.id);
+                                          field.onChange(updatedValue);
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">
+                                      {item.label}
+                                    </FormLabel>
+                                  </FormItem>
+                                );
+                              }}
+                            />
+                          ))}
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {watchMeetingTypeService.includes('webinar_panelist') && (
+                      <>
+                        <Table className='max-w-[400px]'>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Name</TableHead>
+                              <TableHead>Email</TableHead>
+                              <TableHead>
+                                <Dialog open={modalPanelist} onOpenChange={setIsModalPanelist}>
+                                  <DialogTrigger asChild>
+                                    <Button variant="outline">Add</Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="sm:max-w-[425px]">
+                                    <DialogHeader>
+                                      <DialogTitle>Add New Panelist</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="grid gap-4 py-4">
+                                      <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="name" className="text-right">
+                                          Name
+                                        </Label>
+                                        <Input
+                                          id="name"
+                                          value={newPanelist.name}
+                                          onChange={(e) => setNewPanelist({ ...newPanelist, name: e.target.value })}
+                                          className="col-span-3"
+                                        />
+                                      </div>
+                                      <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="email" className="text-right">
+                                          Email
+                                        </Label>
+                                        <Input
+                                          id="email"
+                                          type="email"
+                                          value={newPanelist.email}
+                                          onChange={(e) => setNewPanelist({ ...newPanelist, email: e.target.value })}
+                                          className="col-span-3"
+                                        />
+                                      </div>
+                                    </div>
+                                    <Button onClick={addPanelist}>Add Panelist</Button>
+                                  </DialogContent>
+                                </Dialog>
+                              </TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {panelists.map((item: { name: string, email: string }) => (
+                              <TableRow key={item.name}>
+                                <TableCell>{item.name}</TableCell>
+                                <TableCell>{item.email}</TableCell>
+                                <TableCell>
+                                  <Button
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      removePanelist(item.name);
+                                    }}
+                                    variant="ghost"
+                                  >
+                                    <Trash2
+                                      className='h-4 w-4 text-red-700'
+
+                                    />
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </>
+                    )}
+
+                    <AdditionalField
+                      control={form.control}
+                      dataServices={watchMeetingTypeService}
+                      defaultValues={data}
+                    />
+
+                  </>
+                )}
+
+
+                {watchEvent === "hybrid" && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="meeting_type_service"
+                      render={() => (
+                        <FormItem>
+                          {hybridChoice.map((item) => (
+                            <FormField
+                              key={item.id}
+                              control={form.control}
+                              name="meeting_type_service"
+                              render={({ field }) => {
+                                return (
+                                  <FormItem
+                                    key={item.id}
+                                    className="flex flex-row items-start space-x-3 space-y-0"
+                                  >
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value?.includes(item.id)}
+                                        onCheckedChange={(checked) => {
+                                          return checked
+                                            ? field.onChange([
+                                              ...field.value,
+                                              item.id,
+                                            ])
+                                            : field.onChange(
+                                              field.value?.filter(
+                                                (value) => value !== item.id
+                                              )
+                                            );
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">
+                                      {item.label}
+                                    </FormLabel>
+                                  </FormItem>
+                                );
+                              }}
+                            />
+                          ))}
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="camera_setup"
                       render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormLabel>Link</FormLabel>
+                        <FormItem className="space-y-3">
+                          <FormLabel>Camera Setup</FormLabel>
                           <FormControl>
-                            <Input placeholder="Link" {...field} />
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex flex-col space-y-1"
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="oneCamera" />
+                                </FormControl>
+                                <FormLabel>1 Camera set-up</FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="twoCamera" />
+                                </FormControl>
+                                <FormLabel>2 Camera set-up</FormLabel>
+                              </FormItem>
+                            </RadioGroup>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                  </div>
-                </div>
+                  </>
+                )}
+
+
+
+                {watchEvent === "training" && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="meeting_type_service"
+                      render={() => (
+                        <FormItem>
+                          {trainingChoice.map((item) => (
+                            <FormField
+                              key={item.id}
+                              control={form.control}
+                              name="meeting_type_service"
+                              render={({ field }) => {
+                                return (
+                                  <FormItem
+                                    key={item.id}
+                                    className="flex flex-row items-start space-x-3 space-y-0"
+                                  >
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value?.includes(item.id)}
+                                        onCheckedChange={(checked) => {
+                                          return checked
+                                            ? field.onChange([
+                                              ...field.value,
+                                              item.id,
+                                            ])
+                                            : field.onChange(
+                                              field.value?.filter(
+                                                (value) => value !== item.id
+                                              )
+                                            );
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">
+                                      {item.label}
+                                    </FormLabel>
+                                  </FormItem>
+                                );
+                              }}
+                            />
+                          ))}
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
+
               </div>
+
+
             </div>
+
+
             <Button
               onClick={form.handleSubmit(onEdit, onError)}
-            >
-              {isPending && <Loader2 className="animate-spin" />}
-              {!isPending && "Submit"}
-            </Button>
+              className='mt-10'
+              type="submit">Submit</Button>
 
           </form>
         </Form>
       </SkeletonWrapper>
-    </>
+    </div>
+
   )
 }
 

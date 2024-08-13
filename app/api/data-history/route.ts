@@ -27,8 +27,6 @@ export async function GET(request: Request) {
         })
     }
 
-    console.log(queryParams.data.from)
-    console.log(queryParams.data.to)
 
 
     const result = await getOverViewData(

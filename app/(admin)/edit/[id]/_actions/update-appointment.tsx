@@ -20,6 +20,8 @@ export async function UpdateAppointment(form: CreateAppointmentSchemaType, id: s
         dry_run_end_time,
         does_have_assistance,
         name_of_assistance,
+        panelist,
+        reminder,
         //set 4
         meeting_type_option,
         meeting_type_service,
@@ -30,6 +32,7 @@ export async function UpdateAppointment(form: CreateAppointmentSchemaType, id: s
 
     const tcet_assistance = does_have_assistance.join()
     const meeting_service = meeting_type_service.join()
+    const currentReminder = reminder ? reminder.join(',') : null
     
     await db.$transaction(async (prisma) => {
         const appointment = await prisma.appointment.update({
@@ -56,9 +59,10 @@ export async function UpdateAppointment(form: CreateAppointmentSchemaType, id: s
                 //set 4
                 meeting_type_option,
                 meeting_type_service: meeting_service,
+                panelist,
+                reminder: currentReminder,
                 meeting_type_link,
                 camera_setup,
-                status
             }
         })
 

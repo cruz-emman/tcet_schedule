@@ -177,6 +177,24 @@ export const trainingChoice = [
   }
 ]
 
+export const reminderChoice = [
+  {
+    id: 'one_hour',
+    label: '1 hour before the start date and time'
+    
+  },
+  {
+    id: 'one_day',
+    label: '1 day before the start date and time'
+  },
+  {
+    id: 'one_week',
+    label: "1 week before the start date and time"
+  },
+
+
+
+]
 
 
 export const timeAM = [
