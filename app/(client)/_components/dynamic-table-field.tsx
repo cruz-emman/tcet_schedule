@@ -102,7 +102,7 @@ const DynamicTableField = ({
                     <DialogHeader>
                         <DialogTitle>Add panelist</DialogTitle>
                         <DialogDescription>
-                            Make changes to your panelist here. Click save when you &apos; re done.
+                            Make changes to your panelist here.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
