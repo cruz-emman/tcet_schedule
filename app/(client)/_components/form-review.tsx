@@ -181,7 +181,7 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
                                             </div>
                                                 <div className="flex capitalize flex-col">
                                                     {tcetAssitance.map((panel: { name: string; email: string }) => (
-                                                        <div className="flex flex-row overflow-x-auto w-full items-center justify-center gap-x-4 ">
+                                                        <div key={panel.name} className="flex flex-row overflow-x-auto w-full items-center justify-center gap-x-4 ">
                                                             <p className="w-[200px]">{panel.name}</p>
                                                             <p className="w-[200px]">{panel.email}</p>
                                                         </div>
