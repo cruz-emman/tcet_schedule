@@ -398,10 +398,10 @@ const OverviewTable = ({ from, to }: Props) => {
         </div>
         <div className='flex flex-wrap gap-2'>
           <DataTableViewOptions table={table} />
-          <Button variant={"outline"} size={"sm"} className='ml-auto h-8 lg:flex' >
+          {/* <Button variant={"outline"} size={"sm"} className='ml-auto h-8 lg:flex' >
             <DownloadIcon className='mr-2 h-4 w-4' />
             Export CSV
-          </Button>
+          </Button> */}
         </div>
       </div>
       <SkeletonWrapper isLoading={history.isFetching}>

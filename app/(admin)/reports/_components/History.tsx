@@ -133,6 +133,7 @@ const History = () => {
 
 
 
+
   const zoomDataQuery = useQuery({
     queryKey: ['zoom', timeFrame, period],
     queryFn: () => fetch(`/api/export-csv?timeframe=${timeFrame}&year=${period.year}&month=${period.month}`)
@@ -203,7 +204,7 @@ const History = () => {
         >
         <DownloadIcon className='mr-2 h-4 w-4'
         />
-        Export1
+        Export
       </Button>
       <Card className='col-span-12 mt-2 w-full'>
         <CardHeader className='gap-2'>
@@ -246,7 +247,7 @@ const History = () => {
                       padding={{ left: 5, right: 5 }}
                       dataKey={(data) => {
                         const { year, month, day } = data;
-                        const date = new Date(year, month, day || 0);
+                        const date = new Date(year, month, day + 1 || 0);
                         if (timeFrame === "year") {
                           return date.toLocaleDateString("default", {
                             month: "short",

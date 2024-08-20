@@ -68,7 +68,7 @@ const ClientDashboard = () => {
 
             <div className="flex flex-col flex-1 w-full ">
               <h1 className="text-lg font-semibold  text-gray-400">Dry Run</h1>
-              <div className="h-full flex max-h-[650px] bg overflow-y-auto flex-col gap-y-2 flex-grow md:min-h-[600px] min-h-full bg-gray-100/90">
+              <div className="h-full flex max-h-[650px] bg overflow-y-auto flex-col gap-y-2 flex-grow md:min-h-[600px] min-h-full ">
                 <SkeletonWrapper isLoading={selectedDate.isFetching}>
                   {dry_run_true?.length === 0 ? (
                     <p>No event today</p>

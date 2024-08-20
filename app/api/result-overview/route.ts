@@ -138,10 +138,13 @@ async function getMonthHistoryData(year: number, month: number): Promise<History
     )
   );
 
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInMonth = new Date(year, month , 0).getDate();
+  const daysInMonth1 = getDaysInMonth(new Date(year, month))
 
-  const history: HistoryData[] = Array.from({ length: daysInMonth }, (_, i) => {
-    const day = i + 1;
+
+
+  const history: HistoryData[] = Array.from({ length: daysInMonth1 }, (_, i) => {
+    const day = i ;
     const counts: StatusCounts = {
       pending: 0,
       approved: 0,

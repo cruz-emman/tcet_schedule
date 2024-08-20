@@ -106,6 +106,7 @@ const EditAppointment = ({ params }: EditPostPageProps) => {
 
 
 
+
   useEffect(() => {
     if (data) {
       form.reset({
@@ -232,12 +233,13 @@ const EditAppointment = ({ params }: EditPostPageProps) => {
 
   //For submitting actual form
   const onEdit = (values: CreateAppointmentSchemaType) => {
+
     const formData = {
       ...values,
       name_of_assistance: assistants,
       panelist: panelists
     };
-    console.log(formData)
+    
     mutate({ form: formData, id: params.id });
   }
   const onError = (error: any) => {
@@ -527,9 +529,10 @@ const EditAppointment = ({ params }: EditPostPageProps) => {
                                       >
                                         <Calendar
                                           mode="single"
-                                          disabled={(date) =>
-                                            new Date(date) <= new Date()
-                                          } // Disable past dates and today's date
+                                          disabled={[
+                                            { before: new Date() },
+                                            { after: data?.event_date }
+                                          ]}// Disable past dates and today's date
                                           selected={field.value}
                                           onSelect={field.onChange}
                                           initialFocus
@@ -573,7 +576,7 @@ const EditAppointment = ({ params }: EditPostPageProps) => {
                     <FormItem>
                       <div className="mb-4">
                         <FormLabel className="text-base">
-                          Tech Assitance
+                          Tech Assistance
                         </FormLabel>
                       </div>
                       {does_have_assistance_choice.map((item) => (
