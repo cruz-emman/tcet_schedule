@@ -239,7 +239,7 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
                                             </div>
                                             <div className="flex capitalize flex-col">
                                                 {showPanelist.map((panel: { name: string; email: string }) => (
-                                                        <div className="flex flex-row overflow-x-auto w-full  ">
+                                                        <div key={panel.name} className="flex flex-row overflow-x-auto w-full  ">
                                                          <p className="w-[200px]">{panel.name}</p>
                                                          <p className="w-[200px]">{panel.email}</p>
                                                     </div>
@@ -254,7 +254,7 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
                                         <TableCell>
                                             <div className="flex capitalize flex-col">
                                                 {reminderExisting.map((item:any) => (
-                                                    <div className="flex flex-row overflow-x-auto gap-x-4 ">
+                                                    <div key={item} className="flex flex-row overflow-x-auto gap-x-4 ">
                                                        <div className="flex items-center space-y-2 space-x-2">
                                                             <Checkbox id={item} checked={true}  className="mr-2" />
                                                             {item}
