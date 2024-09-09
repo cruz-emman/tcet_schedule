@@ -12,7 +12,6 @@ import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { DateToUTCDate } from "@/lib/helpers";
 import { reminderChoice } from "@/lib/data";
-import { format } from "date-fns";
 import {
     Table,
     TableBody,
@@ -24,6 +23,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox";
+import { format, compareAsc, parse, getDate, getYear, getMonth } from "date-fns";
 
 
 interface FinalizeFormProps {
@@ -36,6 +36,8 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
     const formattedDate = format(event_date, 'MMMM dd yyyy');
     const getServices = form.watch('meeting_type_service')
     const getDryRun = form.watch('does_have_dry_run')
+
+
 
 
     const returnArray = (data: string[]) => {
@@ -61,6 +63,7 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
     let showReminder = form.watch('reminder')
     let showPanelist = form.watch('panelist')
 
+    console.log(form.watch())
 
     const isReminderExisting = (showReminder: any) => {
         return showReminder.map((reminder: any) => {
@@ -135,10 +138,54 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
                                     <TableCell className="w-[250px]">End:</TableCell>
                                     <TableCell>{form.watch('end_time')}</TableCell>
                                 </TableRow>
-
+                                
                             </TableBody>
                         </Table>
                     </div>
+
+                    {form.watch('additional_date_information').length > 0 && (
+                        <>
+                        <Separator
+                        orientation="horizontal"
+                        className="my-2 w-full bg-slate-200"
+                        />
+                        
+                        <div className="flex flex-col gap-y-2">
+                        <p className="font-semibold">Recurring Dates</p>
+                        <Table>
+                            <TableHeader></TableHeader>
+                            <TableBody>
+                            <TableRow>
+                                    <TableCell className="w-[250px]">Additional Date:</TableCell>
+                                    <TableCell
+                                    
+                                    >{form.watch('additional_date_information').map(({additonal_date_data, additonal_date_end, additonal_date_start, index}: {
+                                        additonal_date_data: any
+                                        additonal_date_start: string
+                                        additonal_date_end: string
+                                        index: number
+
+                                    }) => {
+                                        let date = additonal_date_data.toString().split(' ')
+                                        
+                                        return (    
+                                         <TableRow>
+                                               <div 
+                                                key={index}
+                                            > {date[1]} {date[2]}, {date[3]}  {additonal_date_start} - {additonal_date_end}</div>
+                                         </TableRow>
+                                        )
+                                    })}</TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                        </div>
+                        </>
+                    )}
+
+                  
+
+                    
 
                     <Separator
                         orientation="horizontal"

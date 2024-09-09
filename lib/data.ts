@@ -167,10 +167,7 @@ export const trainingChoice = [
     id: 'training_TLC',
     label: 'TLC Training'
   },
-  {
-    id: 'training_turnItIn',
-    label: 'TurnItIn'
-  },
+
   {
     id: 'training_others',
     label: 'Others'
@@ -285,46 +282,6 @@ export const timePM = [
     id: 23,
     time: '5:00 PM'
   },
-  {
-    id: 24,
-    time: '5:30 PM'
-  },
-  {
-    id: 25,
-    time: '6:00 PM'
-  },
-  {
-    id: 26,
-    time: '6:30 PM'
-  },
-  {
-    id: 27,
-    time: '7:00 PM'
-  },
-  {
-    id: 28,
-    time: '7:30 PM'
-  },
-  {
-    id: 29,
-    time: '8:00 PM'
-  },
-  {
-    id: 30,
-    time: '8:30 PM'
-  },
-  {
-    id: 31,
-    time: '9:00 PM'
-  },
-  {
-    id: 32,
-    time: '9:30 PM'
-  },
-  {
-    id: 33,
-    time: '10:00 PM'
-  },
 ];
 
 
@@ -341,7 +298,7 @@ export const NavbarLinks = [
 export const StatusOption = [
   {
     value: "pending",
-    badgeColor: 'bg-blue-500',
+    badgeColor: 'bg-yellow-500',
     label: "Pending",
 
   },
@@ -357,7 +314,7 @@ export const ResultOption = [
   {
     value: "done",
     label: "Done",
-    badgeColor: 'bg-yellow-500',
+    badgeColor: 'bg-blue-500',
 
   },
   {
@@ -395,3 +352,12 @@ export const departmentOptions = [
   {label: 'URD', value: "URD"},
   {label: 'VPAA', value: "VPAA"},
 ]
+
+
+export const assistedBy = [
+  {id: "alyanna", label: "Alyanna"},
+  {id: "emman", label: "Emman"},
+  {id: "laciste", label: "Laciste"},
+  {id: "kyle", label: "Kyle"},
+  {id: "juvi", label: "Juvi"},
+] as const

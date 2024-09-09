@@ -27,9 +27,9 @@ const AuthenticatedLayout = async ({ children }: { children: ReactNode }) => {
       ) : (
         <div className="relative flex h-screen w-full flex-col">
           <Navbar />
-          <div className='flex'>
+          <div className='flex flex-1'>
             <SideBar />
-            <div className="w-full">
+            <div className="flex-1 overflow-auto">
               {children}
             </div>
           </div>

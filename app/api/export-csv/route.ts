@@ -1,12 +1,14 @@
 import { db } from "@/lib/db";
-import { Period, TimeFrame } from "@/lib/types";
+import { Period, Services, TimeFrame } from "@/lib/types";
+import { getDaysInMonth } from "date-fns";
 import { z } from "zod";
 
 const getHistoryDataSchema = z.object({
   timeframe: z.enum(['month', 'year']),
   month: z.coerce.number().min(0).max(11).default(0),
-  year: z.coerce.number().min(2000).max(3000)
-})
+  year: z.coerce.number().min(2000).max(3000),
+  services: z.enum(["meeting", "webinar", "hybrid", "documentation", "training", "events"])
+});
 
 
 export async function GET(request: Request) {
@@ -14,25 +16,31 @@ export async function GET(request: Request) {
   const timeframe = searchParams.get('timeframe')
   const year = searchParams.get('year')
   const month = searchParams.get('month')
+  const services = searchParams.get('service') as Services;
+
 
   const queryParams = getHistoryDataSchema.safeParse({
     timeframe,
     year,
-    month
-  })
+    month,
+    services
+  });
 
   if (!queryParams.success) {
     return Response.json(queryParams.error.message, {
       status: 400
-    })
+    });
   }
 
   try {
     const data = await getZoomReportData(
-      queryParams.data.timeframe, {
-      month: queryParams.data.month,
-      year: queryParams.data.year
-    }
+      queryParams.data.timeframe,
+      {
+        month: queryParams.data.month,
+        year: queryParams.data.year
+      },
+      queryParams.data.services,
+
     )
 
     return Response.json(data)
@@ -44,19 +52,19 @@ export async function GET(request: Request) {
 
 
 async function getZoomReportData(
-  timeframe: TimeFrame, period: Period
+  timeframe: TimeFrame, period: Period, services: Services,
 ) {
   switch (timeframe) {
-    case "year":
-      return getYearZoomData(period.year)
+    // case "year":
+    //   return getYearZoomData(period.year)
     case "month":
-      return await getMonthZoomData(period.year, period.month)
+      return await getMonthZoomData(period.year, period.month, services)
   }
 }
 
 
 interface HistoryData {
-  year: number;
+  year: number; 
   month: number;
   day?: number;
   counts?: DepartmentCounts;
@@ -84,11 +92,12 @@ interface DepartmentCounts {
 }
 
 
-async function getYearZoomData(year: number) {
+// async function getYearZoomData(year: number) {
 
-}
+// }
+const statusFilters = ['done', 'cancel']; // List of statuses to include
 
-async function getMonthZoomData(year: number, month: number) {
+async function getMonthZoomData(year: number, month: number, services: Services) {
   const departments = ['CAHS', 'CASE', 'CBMA', 'CEIS', 'CHTM', 'CMT', 'SLCN', 'THS', 'AIRGEO', 'CHAPLAIN', 'TGCC', 'OAR', 'OP', 'OSMA', 'PRPO', 'SAC', 'URDC', 'VPAA']
 
   const results = await Promise.all(
@@ -97,12 +106,20 @@ async function getMonthZoomData(year: number, month: number) {
         by: ['day'],
         where: {
           year,
-          month,
+          month: month + 1,
           soft_delete_scheduleDate: false,
+          //meeting_type_option: services,
           appointment: {
             soft_delete: false,
-            department
-          }
+            department,
+            meeting_type_option: services,
+            status: {
+              in: statusFilters
+            },
+            additonalDates: {
+
+            }
+          },
         },
         orderBy: [{ day: 'asc' }],
         _count: { _all: true },
@@ -110,24 +127,22 @@ async function getMonthZoomData(year: number, month: number) {
     )
   );
 
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInMonth1 = getDaysInMonth(new Date(year, month))
   const departmentCounts: Record<string, Record<number, number>> = {};
   departments.forEach(department => {
     departmentCounts[department] = {};
   });
 
-  for (let day = 1; day <= daysInMonth; day++) {
+  for (let day = 0; day <= daysInMonth1; day++) {
     departments.forEach((department, index) => {
       const dayData = results[index].find(item => item.day === day);
       departmentCounts[department][day + 1] = dayData ? dayData._count._all : 0;
     });
   }
 
-    return {
+  return {
     month: new Date(year, month).toLocaleString('default', { month: 'long' }),
     data: departmentCounts
   };
-
-
 
 }

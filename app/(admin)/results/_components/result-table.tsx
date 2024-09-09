@@ -131,6 +131,17 @@ const columns: ColumnDef<OverviewTableRow>[] = [
       return value.includes(row.getValue(id))
     },
   },
+  {
+    accessorKey: "editedBy",
+    header: "Assited By",
+    cell: ({row}) => {
+      return (
+        <>{row.original.editedBy}</>
+      )
+    }
+
+
+  },
 
 ]
 

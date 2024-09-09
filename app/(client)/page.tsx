@@ -35,7 +35,6 @@ const ClientDashboard = () => {
 
 
 
-  console.log(date)
 
   return (
     <div className="w-full px-8 ">

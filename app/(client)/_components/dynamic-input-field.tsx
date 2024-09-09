@@ -22,7 +22,7 @@ const DynamicInputField: React.FC<Props> = ({
   placeholder,
 }) => {
   const { fields, append, remove } = useFieldArray({
-control,
+    control,
     name,
   });
 
@@ -37,50 +37,50 @@ control,
   return (
     <div className='flex flex-col gap-y-2'>
       <div className='mb-4'>
-      <FormLabel className="text-base">{label}</FormLabel>
+        <FormLabel className="text-base">{label}</FormLabel>
 
       </div>
       {fields.map((field, index) => {
         return (
-            <div key={field.id} className="flex flex-row gap-x-2 mb-2">
-              <FormField
-                control={control}
-                name={`${name}.${index}.name`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input placeholder={placeholder.name} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name={`${name}.${index}.email`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input placeholder={placeholder.email} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button 
-                onClick={() => remove(index)}
-                variant="outline" 
-                size="icon"
-                type="button"
-              >
-                <Trash className="h-4 w-4" />
-              </Button>
-            </div>
-          )
+          <div key={field.id} className="flex flex-row gap-x-2 mb-2">
+            <FormField
+              control={control}
+              name={`${name}.${index}.name`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input placeholder={placeholder.name} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name={`${name}.${index}.email`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input placeholder={placeholder.email} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              onClick={() => remove(index)}
+              variant="outline"
+              size="icon"
+              type="button"
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          </div>
+        )
       })}
-      <Button 
+      <Button
         className='w-20'
-        onClick={() => append({ name: '', email: '' })} 
+        onClick={() => append({ name: '', email: '' })}
         size="sm"
         type="button"
       >

@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { Period, TimeFrame } from "@/lib/types";
+import { Period, Services, TimeFrame } from "@/lib/types";
 import { getDaysInMonth } from "date-fns";
 import { z } from "zod";
 
@@ -7,6 +7,7 @@ const getHistoryDataSchema = z.object({
   timeframe: z.enum(['month', 'year']),
   month: z.coerce.number().min(0).max(11).default(0),
   year: z.coerce.number().min(2000).max(3000),
+  services: z.enum(["meeting", "webinar", "hybrid", "documentation", "training", "events"])
 })
 
 
@@ -15,14 +16,16 @@ const { searchParams } = new URL(request.url)
   const timeframe = searchParams.get('timeframe')
   const year = searchParams.get("year")
   const month = searchParams.get("month")
+  const services = searchParams.get('service')
+
 
 
   const queryParams = getHistoryDataSchema.safeParse({
     timeframe,
     year,
-    month
+    month,
+    services
   })
-
 
   if (!queryParams.success) {
     return Response.json(queryParams.error.message, {
@@ -33,10 +36,13 @@ const { searchParams } = new URL(request.url)
 
   try {
     const data = await getHistoryData(
-      queryParams.data.timeframe, {
-      month: queryParams.data.month,
-      year: queryParams.data.year
-    })
+      queryParams.data.services,
+      queryParams.data.timeframe, 
+      {
+        month: queryParams.data.month,
+        year: queryParams.data.year,
+      }
+    )
 
 
     return Response.json(data)
@@ -48,14 +54,15 @@ const { searchParams } = new URL(request.url)
 }
 
 async function getHistoryData(
+  services: Services,
   timeframe: TimeFrame,
-  period: Period
+  period: Period,
 ) {
   switch (timeframe) {
     case "year":
-      return getYearHistoryData(period.year)
+      return getYearHistoryData(period.year, services)
     case "month":
-      return await getMonthHistoryData(period.year, period.month);
+      return await getMonthHistoryData(period.year, period.month, services);
 
   }
 }
@@ -74,7 +81,8 @@ interface StatusCounts {
   cancel: number;
 }
 
-async function getYearHistoryData(year: number): Promise<HistoryData[]> {
+
+async function getYearHistoryData(year: number, services:Services): Promise<HistoryData[]> {
   const statuses = ['pending', 'approved', 'done', 'cancel'];
   const results = await Promise.all(
     
@@ -86,7 +94,9 @@ async function getYearHistoryData(year: number): Promise<HistoryData[]> {
           soft_delete_scheduleDate: false,
           appointment: {
             soft_delete: false,
-            status
+            status,
+            meeting_type_option: services
+
           }
         },
         orderBy: [{ month: 'asc' }],
@@ -115,7 +125,7 @@ async function getYearHistoryData(year: number): Promise<HistoryData[]> {
   return history;
 }
 
-async function getMonthHistoryData(year: number, month: number): Promise<HistoryData[]> {
+async function getMonthHistoryData(year: number, month: number, services: Services): Promise<HistoryData[]> {
   const statuses = ['pending', 'approved', 'done', 'cancel'] as const;
   type Status = typeof statuses[number];
 
@@ -125,11 +135,13 @@ async function getMonthHistoryData(year: number, month: number): Promise<History
         by: ['day'],
         where: {
           year,
-          month,
+          month:month + 1,
           soft_delete_scheduleDate: false,
           appointment: {
             soft_delete: false,
-            status
+            status,
+            meeting_type_option: services
+
           }
         },
         orderBy: [{ day: 'asc' }],
@@ -138,13 +150,13 @@ async function getMonthHistoryData(year: number, month: number): Promise<History
     )
   );
 
-  const daysInMonth = new Date(year, month , 0).getDate();
+
   const daysInMonth1 = getDaysInMonth(new Date(year, month))
 
 
 
   const history: HistoryData[] = Array.from({ length: daysInMonth1 }, (_, i) => {
-    const day = i ;
+    const day = i + 1;
     const counts: StatusCounts = {
       pending: 0,
       approved: 0,

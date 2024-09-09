@@ -3,7 +3,7 @@ import SkeletonWrapper from '@/components/skeleton-wrapper';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Period, TimeFrame } from '@/lib/types'
+import { Period, Services, TimeFrame } from '@/lib/types'
 import { useQuery } from '@tanstack/react-query';
 import React from 'react'
 
@@ -13,17 +13,21 @@ interface Props {
     setPeriod: (period: Period) => void;
     timeFrame: TimeFrame;
     setTimeFrame: (timeFrame: TimeFrame) => void;
+    services: Services;
+    setServices: (services: Services) => void;
 }
 
 const HistoryPeriodSelector = ({
     period,
     setPeriod,
     timeFrame,
-    setTimeFrame
+    setTimeFrame,
+    services,
+    setServices
 }: Props) => {
 
     const historyPeriods = useQuery<getHistoryPeriodsResponseType>({
-        queryKey: ['overview', 'history', 'periods'],
+        queryKey: ['overview', 'history', 'periods','services'],
         queryFn: () => fetch(`api/result-period`).then((res) => res.json())
     })
 
@@ -50,6 +54,9 @@ const HistoryPeriodSelector = ({
 
                         </SkeletonWrapper>
                     )}
+                    <SkeletonWrapper isLoading={historyPeriods.isFetching} fullWidth={false}>
+                        <ServiceSelector services={services} setServices={setServices} />
+                    </SkeletonWrapper>
                 </div>
             </SkeletonWrapper>
         </div>
@@ -120,6 +127,34 @@ function MonthSelector({ period, setPeriod }: {
                 })}
             </SelectContent>
 
+        </Select>
+    )
+}
+
+
+function ServiceSelector({ services, setServices }: {
+    services: Services;
+    setServices: (services: Services) => void;
+}
+) {
+    return (
+        <Select
+            value={services}
+            onValueChange={(value: string) => {
+                setServices(value as Services);
+            }}
+        >
+            <SelectTrigger className='w-[180px]'>
+                <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem value='meeting'>meeting</SelectItem>
+                <SelectItem value='webinar'>webinar</SelectItem>
+                <SelectItem value='hybrid'>hybrid</SelectItem>
+                <SelectItem value='documentation'>documentation</SelectItem>
+                <SelectItem value='training'>training</SelectItem>
+                <SelectItem value='events'>events</SelectItem>
+            </SelectContent>
         </Select>
     )
 }

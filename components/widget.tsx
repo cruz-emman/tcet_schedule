@@ -39,9 +39,10 @@ const Widgets = () => {
     })
     
     queryClient.invalidateQueries({
-        queryKey: ["data", "history"]
+        queryKey: ["data", "history", 'approved', 'pendings','done','cancel']
       });
 
+      
     
 
 

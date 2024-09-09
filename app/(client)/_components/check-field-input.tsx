@@ -31,6 +31,7 @@ interface CheckboxFieldInputProps {
   defaultValue?: string[],
   currentPanelist?: any,
   currentReminder?: any
+  trainingName?: any
 }
 
 const CheckboxFieldInput = ({
@@ -41,7 +42,8 @@ const CheckboxFieldInput = ({
   linkControl,
   defaultValue,
   currentPanelist,
-  currentReminder
+  currentReminder,
+  trainingName
 }: CheckboxFieldInputProps) => {
 
 
@@ -196,6 +198,28 @@ const CheckboxFieldInput = ({
               />
             </div>
           )}
+
+        {openLiveStreaming.includes('training_others') && (
+        <div className="px-2 pt-5">
+            <FormField
+              control={linkControl}
+              name={"other_training"}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Training </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="anything connected with TCET"
+                      {...field}
+                    />
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        )}
 
         {(openLiveStreaming.includes("meeting_hybrid") || openLiveStreaming.includes('webinar_hybrid')) && (
           <div className="px-2 pt-5">

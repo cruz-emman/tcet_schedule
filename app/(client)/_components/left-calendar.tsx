@@ -3,11 +3,12 @@ import { Calendar } from '@/components/ui/calendar'
 import React, { useEffect, useState } from 'react'
 import CreateScheduleDialog from './create-schedule-dialog'
 import { Button } from '@/components/ui/button'
-import { isBefore, format , startOfDay } from 'date-fns'
+import { isBefore, format, startOfDay } from 'date-fns'
 import { useCurrentUser } from '@/hooks/user-current-user'
 import DateTimeClock from './date_time_clock'
 import Image from 'next/image'
 import { CalendarClock, CalendarIcon } from 'lucide-react'
+import { Separator } from '@/components/ui/separator'
 
 
 interface Props {
@@ -18,16 +19,9 @@ interface Props {
 const LeftCalendar = ({ date, setDate }: Props) => {
 
   const user = useCurrentUser()
-
-
-
   const [open, setOpen] = useState<boolean>(false);
 
-
-
   const openDialogBox = (currentDate: Date | undefined) => {
-
-
     if (currentDate) {
       setDate(currentDate);
       setOpen(true);
@@ -40,13 +34,34 @@ const LeftCalendar = ({ date, setDate }: Props) => {
 
 
   return (
-    
-    <div className='flex flex-col items-center justify-center gap-y-2 h-full md:h-[800px]  relative'>
-      <div className='w-full flex gap-x-2 p-4 rounded-full mb-8 border-2 text-xl font-semibold text-green-700'>
-        <CalendarClock />
-        <span className=''>{`${format(new Date(), 'MM/dd/yyyy')}`}</span>
+
+    <div className='flex flex-col  justify-center gap-y-2 h-full md:h-[800px]  relative'>
+      <p className='text-lg text-left'> DATE TODAY: </p>
+      <div className='flex flex-col'>
+        <div className='w-full flex gap-x-2 p-4 rounded-full mb-8 border-2 text-xl font-semibold text-green-700'>
+          <CalendarClock />
+          <span className=''>{`${format(new Date(), 'MM/dd/yyyy')}`}</span>
+        </div>
+        {/* 
+        <div className='flex flex-grow gap-x-5 items-center '>
+          <h1 className='text-xs font-bold'>Legends: </h1>
+          <div className='flex items-center justify-center'>
+            <div className='w-5 h-5 rounded-full mr-1 bg-green-500' />
+            <span className='text-xs'>Available</span>
+          </div>
+          <div className='flex items-center justify-center'>
+            <div className='w-5 h-5 rounded-full mr-1 bg-orange-500' />
+            <span className='text-xs'>Almost Full</span>
+          </div>
+          <div className='flex items-center justify-center'>
+            <div className='w-5 h-5 rounded-full mr-1 bg-red-500' />
+            <span className='text-xs'>Fully Booked</span>
+          </div>
+        </div>
+        */}
+
       </div>
-      <CreateScheduleDialog open={open} setOpen={setOpen} pickedDate={date} />
+
       <div className='flex h-4/6 w-full items-center justify-center'>
         <Calendar
           mode="single"
@@ -71,7 +86,8 @@ const LeftCalendar = ({ date, setDate }: Props) => {
           }}
         />
       </div>
-    
+      <CreateScheduleDialog open={open} setOpen={setOpen} pickedDate={date} />
+
     </div>
 
   )

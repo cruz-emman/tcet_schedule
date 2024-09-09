@@ -21,6 +21,14 @@ export const CreateAppointmentSchema = z.object({
 
   //SET 2
   event_date: z.coerce.date(),
+  additonal_date: z.boolean().default(false),
+  additional_date_information: z.array(
+    z.object({
+      additonal_date_data: z.coerce.date(),
+      additonal_date_start: z.string().min(2, "Pleas provide information"),
+      additonal_date_end: z.string().min(2, "Pleas provide information")
+    })
+  ).optional(),
   start_time: z.string().min(2, {
     message: "Starting time must be set.",
   }),
@@ -66,10 +74,15 @@ export const CreateAppointmentSchema = z.object({
     })
   ).optional(),
   meeting_type_link: z.string().optional(),
+  other_training: z.string().optional(),
   camera_setup: z.string().optional(),
-  status: z.enum(['approved', 'pending', 'cancel', 'done']).default('pending')
+  status: z.enum(['approved', 'pending', 'cancel', 'done']).default('pending'),
+  editedBy: z.array(z.string()).default([])
+
 })
   .superRefine(({
+    additonal_date,
+    additional_date_information,
     does_have_dry_run,
     dry_run_date,
     dry_run_start_time,
@@ -80,6 +93,7 @@ export const CreateAppointmentSchema = z.object({
     meeting_type_link,
     meeting_type_option,
     camera_setup,
+    other_training,
     panelist,
     reminder
   }, ctx) => {
@@ -164,6 +178,27 @@ export const CreateAppointmentSchema = z.object({
           code: "custom",
           message: "Please provide meesing link",
           path: ['camera_setup']
+        })
+      }
+    }
+
+    if(meeting_type_service.includes('training_others')){
+      if(!other_training){
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Provide missing information',
+          path: ['other_training']
+        })
+      }
+    }
+
+
+    if (additonal_date === true) {
+      if (!additional_date_information) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Please provide information',
+          path: ['additional_date_information',]
         })
       }
     }

@@ -332,6 +332,17 @@ const columns: ColumnDef<OverviewTableRow>[] = [
     },
   },
   {
+    accessorKey: "editedBy",
+    header: "Edited By",
+    cell: ({row}) => {
+      return (
+        <>{row.original.editedBy}</>
+      )
+    }
+
+
+  },
+  {
     id: "actions",
     cell: ({ row }) => <ActionCell row={row} />
   }
@@ -357,7 +368,8 @@ const OverviewTable = ({ from, to }: Props) => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const history = useQuery<GetOverDataReponseType>({
     queryKey: ['data', 'history', from, to],
-    queryFn: () => fetch(`/api/data-history?from=${DateToUTCDate(from)}&to=${DateToUTCDate(to)}`).then((res) => res.json())
+    //queryFn: () => fetch(`/api/data-history?from=${DateToUTCDate(from)}&to=${DateToUTCDate(to)}`).then((res) => res.json())
+    queryFn: () => fetch(`/api/data-history?from=${from}&to=${to}`).then((res) => res.json())
   })
 
 

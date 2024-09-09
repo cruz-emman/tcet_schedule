@@ -11,22 +11,34 @@ export async function CancelAppointment(id: string) {
     }
 
     try {
-        const data = await db.appointment.update({
-            where: {
-                id: id
-            },
-            data: {
-                status: 'cancel',
-                User: { 
-                    connect: { id: session.user.id }
+        const result = await db.$transaction(async (prisma) => {
+            const data = await prisma.appointment.update({
+                where: {
+                    id: id
+                },
+                data: {
+                    status: 'cancel',
+                    User: {
+                        connect: { id: session.user?.id }
+                    }
+                },
+                include: {
+                    User: true
                 }
-            },
-            include: {
-                User: true
-            }
+            })
+
+            await prisma.additionalDates.updateMany({
+                where: {
+                    appointmentId: id
+                },
+                data: {
+                    additional_status: 'cancel'
+                }
+            })
+            return data;
         })
 
-        return data;
+        return result
     } catch (error) {
         throw error;
     }

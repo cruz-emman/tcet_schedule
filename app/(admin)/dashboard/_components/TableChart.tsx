@@ -12,6 +12,7 @@ const TableChart = () => {
     from: startOfMonth(new Date()),
     to: endOfMonth(new Date())
   })
+
   return (
     <div className='flex flex-col relative mx-4'>
       <DateRangePicker

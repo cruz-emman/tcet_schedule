@@ -11,22 +11,39 @@ export async function ApprovedAppointment(id: string) {
     }
 
     try {
-        const data = await db.appointment.update({
-            where: {
-                id: id
-            },
-            data: {
-                status: 'approved',
-                User: { 
-                    connect: { id: session.user.id }
+        const result = await db.$transaction(async (prisma) => {
+
+            const updatedAppointment = await prisma.appointment.update({
+                where: {
+                    id: id
+                },
+                data: {
+                    status: 'approved',
+                    User: {
+                        connect: {
+                            id: session.user?.id
+                        }
+                    }
+                },
+                include: {
+                    User: true
                 }
-            },
-            include: {
-                User: true
-            }
+            })
+
+            await prisma.additionalDates.updateMany({
+                where: {
+                    appointmentId: id
+                },
+                data: {
+                    additional_status: 'approved'
+                }
+            })
+            return updatedAppointment;
+
         })
 
-        return data;
+        return result
+
     } catch (error) {
         throw error;
     }

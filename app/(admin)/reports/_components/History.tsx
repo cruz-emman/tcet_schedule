@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Period, TimeFrame } from '@/lib/types'
+import { Period, Services, TimeFrame } from '@/lib/types'
 import { useQuery } from '@tanstack/react-query'
 import React, { useState, useEffect } from 'react'
 import HistoryPeriodSelector from './HistoryPeriodSelector'
@@ -28,97 +28,21 @@ interface DepartmentData {
   [key: string]: number;
 }
 
-interface SampleData {
-  month: string;
-  data: {
-    [department: string]: DepartmentData;
-  };
-}
 
-const sample = {
-  "month": "August",
-  "data": {
-      "CAHS": {
-          "1": 1,
-          "2": 0,
-          "3": 0,
-          "4": 0,
-          "5": 1,
-          "6": 0,
-          "7": 0,
-          "8": 0,
-          "9": 0,
-          "10": 0,
-          "11": 0,
-          "12": 0,
-          "13": 0,
-          "14": 0,
-          "15": 0,
-          "16": 0,
-          "17": 0,
-          "18": 0,
-          "19": 0,
-          "20": 0,
-          "21": 0,
-          "22": 0,
-          "23": 0,
-          "24": 0,
-          "25": 0,
-          "26": 0,
-          "27": 0,
-          "28": 0,
-          "29": 0,
-          "30": 0,
-          "31": 0
-      },
-      "CASE": {
-          "1": 0,
-          "2": 0,
-          "3": 0,
-          "4": 0,
-          "5": 0,
-          "6": 0,
-          "7": 0,
-          "8": 0,
-          "9": 0,
-          "10": 0,
-          "11": 0,
-          "12": 0,
-          "13": 0,
-          "14": 0,
-          "15": 0,
-          "16": 0,
-          "17": 0,
-          "18": 0,
-          "19": 0,
-          "20": 0,
-          "21": 0,
-          "22": 0,
-          "23": 0,
-          "24": 0,
-          "25": 0,
-          "26": 0,
-          "27": 0,
-          "28": 0,
-          "29": 0,
-          "30": 0,
-          "31": 0
-      },
-    }
-}
+
 
 const History = () => {
   const [timeFrame, setTimeFrame] = useState<TimeFrame>('month')
-
   const [period, setPeriod] = useState<Period>({
     month: new Date().getMonth(),
     year: new Date().getFullYear()
 
   })
+  const [services, setServices] = useState<Services>("meeting")
 
   const historyDataQuery = useQuery({
-    queryKey: ['overview', 'history', timeFrame, period],
-    queryFn: () => fetch(`/api/result-overview?timeframe=${timeFrame}&year=${period.year}&month=${period.month}`)
+    queryKey: ['overview', 'history', timeFrame, period, services],
+    queryFn: () => fetch(`/api/result-overview?timeframe=${timeFrame}&year=${period.year}&month=${period.month}&service=${services}`)
       .then((res) => res.json())
       .then((data) => data.map((item: any) => ({
         ...item,
@@ -136,7 +60,7 @@ const History = () => {
 
   const zoomDataQuery = useQuery({
     queryKey: ['zoom', timeFrame, period],
-    queryFn: () => fetch(`/api/export-csv?timeframe=${timeFrame}&year=${period.year}&month=${period.month}`)
+    queryFn: () => fetch(`/api/export-csv?timeframe=${timeFrame}&year=${period.year}&month=${period.month}&service=${services}`)
       .then((res) => res.json())
   })
 
@@ -150,7 +74,7 @@ const History = () => {
 
 
     // Get the departments
-    const departments = Object.keys(data);
+   const departments = Object.keys(data);
     
     // Get the number of days in the month
     const daysInMonth = Object.keys(data[departments[0]]).length;
@@ -214,6 +138,8 @@ const History = () => {
               setPeriod={setPeriod}
               timeFrame={timeFrame}
               setTimeFrame={setTimeFrame}
+              services={services}
+              setServices={setServices}
             />
             <div className="flex h-10 gap-2">
               <Badge variant="outline" className="flex items-center gap-2 text-sm">
@@ -247,7 +173,7 @@ const History = () => {
                       padding={{ left: 5, right: 5 }}
                       dataKey={(data) => {
                         const { year, month, day } = data;
-                        const date = new Date(year, month, day + 1 || 0);
+                        const date = new Date(year, month, day  || 0);
                         if (timeFrame === "year") {
                           return date.toLocaleDateString("default", {
                             month: "short",

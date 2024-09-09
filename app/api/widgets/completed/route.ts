@@ -32,5 +32,16 @@ async function GetDoneData(){
        
     })
 
-    return data
+    const recurringdata = await db.additionalDates.count({
+        where: {
+            additional_date: {
+                gte: startOfMonth(new Date),
+                lte: endOfMonth(new Date)
+            },
+            additional_status: 'done'
+        }
+    })
+
+
+    return  data + recurringdata
 }

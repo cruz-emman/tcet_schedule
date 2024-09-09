@@ -46,7 +46,7 @@ const SeletGroupFieldInput = ({
         defaultValue={defaultValue}
         render={({ field }) => (
           <FormItem className={cn(className)}>
-            <FormLabel>{label}</FormLabel>
+            <FormLabel>{label} (required)</FormLabel>
             <Select 
               disabled={disabled}
             onValueChange={field.onChange} defaultValue={field.value}>

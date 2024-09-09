@@ -37,6 +37,7 @@ import { CreateAppointment } from '../_actions/appoint-schedule';
 import { toast } from 'sonner';
 import { useCurrentUser } from '@/hooks/user-current-user';
 import DynamicInputField from './dynamic-input-field';
+import AdditionalDate from '../../../components/additonal_date';
 
 
 interface Props {
@@ -56,13 +57,13 @@ interface Users {
 const steps = [
   {
     id: 'Step 1',
-  name: 'General Information',
+    name: 'General Information',
     fields: ['title', 'email', 'fullname', 'contact_person', 'department']
   },
   {
     id: 'Step 2',
     name: 'Date, Time and Purpose',
-    fields: ['event_date, start_time', 'end_time', 'purpose']
+    fields: ['event_date', 'additional_date_information', 'start_time', 'end_time', 'purpose', 'additonal_date']
   },
   {
     id: "Step 3",
@@ -72,7 +73,7 @@ const steps = [
   {
     id: "Step 4",
     name: "Type of Service",
-    fields: ['meeting_type_option', 'meeting_type_service', 'panelist', 'reminder', 'meeting_type_link', 'camera_setup']
+    fields: ['meeting_type_option', 'meeting_type_service', 'panelist', 'reminder', 'meeting_type_link', 'camera_setup', 'other_training']
   },
   {
     id: "Steps 5",
@@ -85,7 +86,6 @@ const steps = [
 const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
 
 
-  const user = useCurrentUser()
 
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -96,10 +96,6 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
   const [step, setStep] = useState(0);
   const currentStep = steps[step];
 
-  const [assistancesName, setAssistancesName] = useState<Users>({
-    name: "",
-    email: ""
-  });
 
 
   const form = useForm<CreateAppointmentSchemaType>({
@@ -113,6 +109,9 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
       //Step 2
       purpose: '',
       event_date: pickedDate, // Use the pickedDate prop here
+      //additonal information
+      additonal_date: false,
+      additional_date_information: [],
       start_time: '',
       end_time: '',
       venue: '',
@@ -129,6 +128,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
       panelist: [],
       reminder: [],
       meeting_type_link: '',
+      other_training: '',
       camera_setup: '',
       status: 'pending'
     }
@@ -142,7 +142,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
     //console.log("Fields to validate:", fields);
 
     const isValid = await form.trigger(fields, { shouldFocus: true });
-    //console.log("Validation result:", isValid, form.formState.errors);
+   // console.log("Validation result:", isValid, form.formState.errors);
 
 
     if (!isValid) return;
@@ -161,14 +161,12 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
   };
 
 
-
-
   const queryClient = useQueryClient()
 
   const { mutate, isPending } = useMutation({
     mutationFn: CreateAppointment,
     onSuccess: () => {
-      toast.success('Appointment created successfully 🎉', {
+      toast.success('Your schedule has been submitted upon approval. Kindly wait 1-2 days for your request to be approved working! 🎉', {
         id: "create-appointment"
       })
 
@@ -189,7 +187,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
 
 
   const onSubmit = useCallback((values: CreateAppointmentSchemaType) => {
-    // toast.loading("Creating Appointment...", {id: 'create-appointment'});
+    toast.loading("Creating Appointment...", { id: 'create-appointment' });
     //console.log(values)
     mutate(values)
 
@@ -224,7 +222,6 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
 
 
 
-  //  console.log(form.watch('name_of_assistance'))
 
 
   useEffect(() => {
@@ -243,7 +240,11 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
       form.resetField('reminder')
     }
 
-  }, [pickedDate, form, hasOtherAssistance, watchChoices]);
+    if (form.watch('additonal_date') == false) {
+      form.resetField('additional_date_information')
+    }
+
+  }, [pickedDate, form, hasOtherAssistance, watchChoices, form.watch('additonal_date')]);
 
 
 
@@ -252,7 +253,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
       <DialogTrigger asChild>
         <Button
           disabled={!open}
-          className='w-full'
+          className='w-[120px] text-right'
           color="primary-foreground"
           onClick={() => setDialogOpen(true)}
 
@@ -260,8 +261,8 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
       </DialogTrigger>
       <DialogContent className={
         cn(
-          `max-w-[400px] md:max-w-[900px]`,
-          step === 3 && 'md:max-w-[1200px] md:h-[800px]'
+          `max-w-[400px]  md:max-w-7xl`,
+          step === 3 && 'md:max-w-[1200px]'
         )}>
         <DialogHeader>
           <DialogTitle>{currentStep.name}</DialogTitle>
@@ -279,7 +280,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Title</FormLabel>
+                      <FormLabel>Title (required)</FormLabel>
                       <FormControl>
                         <Input type='text' placeholder="Title" {...field} />
                       </FormControl>
@@ -292,7 +293,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>Email (required)</FormLabel>
                       <FormControl>
                         <Input type="email" placeholder="Email" {...field} />
                       </FormControl>
@@ -305,7 +306,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                   name="fullname"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Scheduled By:</FormLabel>
+                      <FormLabel>Scheduled By: (required)</FormLabel>
                       <FormControl>
                         <Input placeholder="Scheduled By" {...field} />
                       </FormControl>
@@ -318,7 +319,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                   name="contact_person"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Contact Person</FormLabel>
+                      <FormLabel>Contact Person (required)</FormLabel>
                       <FormControl>
                         <Input placeholder="Contact Person" {...field} />
                       </FormControl>
@@ -331,7 +332,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                   name="department"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>College / Unit</FormLabel>
+                      <FormLabel>College / Unit (required)</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -355,6 +356,26 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
             {step == 1 && (
               <div className='flex flex-col gap-y-2'>
 
+
+
+
+
+                <div className='flex flex-col  gap-2 w-full'>
+
+                  <SeletGroupFieldInput
+                    name="start_time"
+                    placeholder="Select time"
+                    control={form.control}
+                    label="Start"
+                  />
+                  <SeletGroupFieldInput
+                    name="end_time"
+                    placeholder="Select time"
+                    control={form.control}
+                    label="End"
+                  />
+
+                </div>
 
                 <FormField
                   control={form.control}
@@ -387,24 +408,36 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                   )}
                 />
 
-                <div className='flex flex-col  gap-2 w-full'>
+                {/* Recurring DATE */}
+                <FormField
+                  control={form.control}
+                  name="additonal_date"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md  ">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormLabel>
+                        Recurring Date
+                      </FormLabel>
+                    </FormItem>
+                  )}
+                />
 
-                  <SeletGroupFieldInput
-                    name="start_time"
-                    placeholder="Select time"
-                    control={form.control}
-                    label="Start"
-                  />
-                  <SeletGroupFieldInput
-                    name="end_time"
-                    placeholder="Select time"
-                    control={form.control}
-                    label="End"
-                  />
 
-
-
-                </div>
+                {form.watch('additonal_date') === true && (
+                  <>
+                    <AdditionalDate
+                      control={form.control}
+                      name="additional_date_information"
+                      pickedDate={pickedDate}
+                      label="Required if click the checkbox, unclick if not"
+                    />
+                  </>
+                )}
 
                 <SelectFieldInput
                   control={form.control}
@@ -455,7 +488,6 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                             <FormControl>
                               <RadioGroupItem
                                 onClick={handleClick}
-
                                 value="false" />
                             </FormControl>
                             <FormLabel className="font-normal">
@@ -705,6 +737,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
 
                     {meetingType === "hybrid" && (
                       <div className='flex flex-col gap-y-5'>
+                        <FormLabel></FormLabel>
                         <FormField
                           control={form.control}
                           name="camera_setup"
@@ -735,8 +768,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                             </FormItem>
                           )}
                         />
-
-
+                        <p>Additional Services (for approval)</p>
                         <CheckboxFieldInput
                           control={form.control}
                           name="meeting_type_service"
@@ -771,13 +803,15 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                           linkControl={form.control}
                           openLiveStreaming={watchChoices}
                           linkInputField="meeting_type_link"
+                          trainingName="other_training"
+
                         />
                       </>
                     )}
 
                     {meetingType === "events" && (
                       <>
-                        
+
                         <CheckboxFieldInput
                           control={form.control}
                           name="meeting_type_service"
@@ -793,7 +827,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
 
                   </div>
                 </div>
-            </div>
+              </div>
             )}
             {step == 4 && (
               <div className='flex flex-col  gap-2'>

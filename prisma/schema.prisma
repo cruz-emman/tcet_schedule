@@ -8,16 +8,16 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// datasource db {
-//   provider = "mysql"
-//   url      = env("DATABASE_URL")
-// }
-
 datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
+
+// datasource db {
+//   provider = "postgresql"
+//   url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+//   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+// }
 
 enum UserRole {
   ADMIN
@@ -48,6 +48,7 @@ model Appointment {
   //SET 2
 
   event_date DateTime
+
   start_time String
   end_time   String
   purpose    String
@@ -67,13 +68,17 @@ model Appointment {
   camera_setup         String?
   status               String
 
+  other_training String?
+
   soft_delete Boolean @default(false)
+  editedBy    String?
 
   createdAt DateTime @default(now())
   updateAt  DateTime @default(now())
 
-  scheduleDate ScheduleDate[]
-  User         User[]
+  scheduleDate   ScheduleDate[]
+  User           User[]
+  additonalDates AdditionalDates[]
 }
 
 model ScheduleDate {
@@ -89,4 +94,18 @@ model ScheduleDate {
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
 
   @@index([appointmentId])
+}
+
+model AdditionalDates {
+  additonalDateId String @id @default(uuid())
+
+  additional_date   DateTime
+  additional_start  String
+  additional_end    String
+  additional_status String
+
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+
+  @@index([appointmentId, additonalDateId])
 }
