@@ -169,10 +169,11 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
                                         let date = additonal_date_data.toString().split(' ')
                                         
                                         return (    
-                                         <TableRow>
-                                               <div 
-                                                key={index}
-                                            > {date[1]} {date[2]}, {date[3]}  {additonal_date_start} - {additonal_date_end}</div>
+                                         <TableRow
+                                         key={index}
+
+                                         >
+                                               <div> {date[1]} {date[2]}, {date[3]}  {additonal_date_start} - {additonal_date_end}</div>
                                          </TableRow>
                                         )
                                     })}</TableCell>
