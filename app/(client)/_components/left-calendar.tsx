@@ -69,7 +69,7 @@ const LeftCalendar = ({ date, setDate }: Props) => {
           onSelect={openDialogBox}
           //Change this according the user/ if admin, make
           //disabled={(date) => isBefore(new Date(date), startOfDay(new Date()))}
-          disabled={user ? (date) => isBefore(new Date(date), startOfDay(new Date())) : (date) => new Date(date) <= new Date()}
+          //disabled={user ? (date) => isBefore(new Date(date), startOfDay(new Date())) : (date) => new Date(date) <= new Date()}
 
           className="shadow-lg p-6 border rounded-md h-full w-full flex "
           classNames={{

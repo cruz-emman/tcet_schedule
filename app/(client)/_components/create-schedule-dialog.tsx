@@ -507,8 +507,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
 
                       {field.value === true && (
                         <FormItem>
-                          <div className="flex flex-col gap-2 pt-2">
-                            <Label>(Dry Run) Time of Event</Label>
+                          <div className="flex flex-col gap-2 pt-2">z
                             <div className="flex flex-col gap-2">
                               <FormField
                                 control={form.control}
