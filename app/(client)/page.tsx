@@ -43,7 +43,7 @@ const ClientDashboard = () => {
           <LeftCalendar setDate={setDate} date={date} />
         </div>
         <div className="flex flex-col flex-1 gap-4 p-8 shadow-md border-2  rounded-3xl">
-        <p className='text-xl font-bold underline text-emerald-500'>SELECTED DAY&apos;S AGENDA  {date && ( <span className='capitalize'>({formatDate(date)})</span>)} </p> 
+          <p className='text-xl font-bold underline text-emerald-500'>SELECTED DAY&apos;S AGENDA  {date && (<span className='capitalize'>({formatDate(date)})</span>)} </p>
           <div className='flex flex-col md:flex-row  w-full'>
             <div className="flex flex-col flex-1 w-full">
               <h1 className="text-lg font-semibold text-gray-400">Event Today</h1>

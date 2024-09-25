@@ -148,6 +148,7 @@ function ServiceSelector({ services, setServices }: {
                 <SelectValue />
             </SelectTrigger>
             <SelectContent>
+                <SelectItem value='all'>all</SelectItem>
                 <SelectItem value='meeting'>meeting</SelectItem>
                 <SelectItem value='webinar'>webinar</SelectItem>
                 <SelectItem value='hybrid'>hybrid</SelectItem>

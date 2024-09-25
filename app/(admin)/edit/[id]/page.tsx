@@ -467,7 +467,7 @@ return (
 
             {/* Date, Time and Purpose */}
 
-            <div className='flex flex-col gap-y-2 bg-gray-100'>
+            <div className='flex flex-col gap-y-2 '>
               <p className='text-lg text-gray-400 font-semibold'>Date, Time and Purpose</p>
 
               <FormField
@@ -777,7 +777,7 @@ return (
             </div>
 
             {/* Dry Run and Assistance */}
-            <div className='flex flex-col gap-y-2 bg-gray-100'>
+            <div className='flex flex-col gap-y-2 '>
               <p className='text-lg text-gray-400 font-semibold'>Dry Run and Assistance</p>
               <FormField
                 control={form.control}
@@ -1027,7 +1027,7 @@ return (
 
             {/* Type of Service */}
 
-            <div className='flex flex-col gap-y-2 bg-gray-100'>
+            <div className='flex flex-col gap-y-2 '>
               <p className='text-lg text-gray-400 font-semibold'>Type Of Service</p>
               <FormField
                 control={form.control}

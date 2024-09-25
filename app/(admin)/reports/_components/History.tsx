@@ -96,6 +96,8 @@ const History = () => {
       row.push(deptTotal);
       return row;
     });
+
+    console.log(rows)
     
     // Create a new workbook and worksheet
     const wb = XLSX.utils.book_new();

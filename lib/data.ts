@@ -25,6 +25,10 @@ export const purposeChoice = [
 
 export const does_have_assistance_choice = [
   {
+    id:'none',
+    label:"None"
+  },
+  {
     id: "tcet",
     label: "TCET",
   },
@@ -164,8 +168,8 @@ export const trainingChoice = [
   },
   {
 
-    id: 'training_TLC',
-    label: 'TLC Training'
+    id: 'training_copyleaks',
+    label: 'Copyleaks Training'
   },
 
   {
@@ -329,28 +333,32 @@ export const MeetingTypeOption = [
   { label: "Webinar", value: "webinar", badgeColor: 'bg-fuchsia-500' },
   { label: "Hybrid", value: "hybrid", badgeColor: 'bg-red-500' },
   { label: "Documentation", value: "documentation", badgeColor: 'bg-orange-500' },
-  { label: "Training", value: "training", badgeColor: 'bg-emerald-500' }
+  { label: "Training", value: "training", badgeColor: 'bg-emerald-500' },
+  { label: 'Events', value: "events", badgeColor: 'bg-rose-500'}
 ]
 
 export const departmentOptions = [
-  {label: 'CAHS', value: "CAHS"},
-  {label: 'CASE', value: "CASE"},
-  {label: 'CBMA', value: "CBMA"},
-  {label: 'CEIS', value: "CEIS"},
-  {label: 'CHTM', value: "CHTM"},
-  {label: 'CMT', value: "CMT"},
-  {label: 'SLCN', value: "SLCN"},
-  {label: 'THS', value: "THS"},
-  {label: 'AIRGEO', value: "AIRGEO"},
+  {label: 'CAHS (College of Allied Health Sciences)', value: "CAHS"},
+  {label: 'CASE (College of Arts, Sciences, and Education)', value: "CASE"},
+  {label: 'CBMA (College of Business, Management & Accountancy)', value: "CBMA"},
+  {label: 'CEIS (College of Engineering and Information Sciences)', value: "CEIS"},
+  {label: 'CHTM (College of Hospitality and Tourism Management)', value: "CHTM"},
+  {label: 'CMT (College of Medical Technology)', value: "CMT"},
+  {label: 'SLCN (St. Luke College of Nursing)' , value: "SLCN"},
+  {label: 'THS (Trinity High School', value: "THS"},
+  //Finish colleges
+
+  {label: 'AIRGEO (Alumni, Industry Relations, and Global Education Office)', value: "AIRGEO"},
   {label: 'CHAPLAIN', value: "CHAPLAIN"},
-  {label: 'TGCC', value: "TGCC"},
-  {label: 'OAR', value: "OAR"},
-  {label: 'OP', value: "OP"},
-  {label: 'OSMA', value: "OSMA"},
-  {label: 'PRPO', value: "PRPO"},
-  {label: 'SAC', value: "SAC"},
-  {label: 'URD', value: "URD"},
-  {label: 'VPAA', value: "VPAA"},
+  {label: 'GS (Graduate School)', value: 'GS'},
+  {label: 'OAR (Office of Admission and Registration)', value: "OAR"},
+  {label: 'OP (Office of the president)', value: "OP"},
+  {label: 'OSMA (Quality Assurance and Strategic Management Office)', value: "OSMA"},
+  {label: 'PPRO', value: "PPRO"},
+  {label: 'TGCC (Trinitian Guidance and Career Center)', value: "TGCC"},
+  {label: 'SAC (Student Affairs Center)', value: "SAC"},
+  {label: 'URDC (University Research and Development Center)', value: "URDC"},
+  {label: 'VPAA (Vice President of Academics Affairs)', value: "VPAA"},
 ]
 
 

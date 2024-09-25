@@ -37,9 +37,6 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
     const getServices = form.watch('meeting_type_service')
     const getDryRun = form.watch('does_have_dry_run')
 
-
-
-
     const returnArray = (data: string[]) => {
         const result = []; // Initialize an empty array to collect the results
         for (let i = 0; i < data.length; i++) {
@@ -76,8 +73,8 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
 
 
     return (
-        <div className="h-[300px] md:h-[600px] w-full">
-            <ScrollArea className="h-[300px] md:h-full w-full  border md:p-4 p-2">
+        <ScrollArea className="h-[300px] md:h-[600px] w-full">
+            <div className="h-[300px] md:h-full w-full  border md:p-4 p-2">
                 <div className="flex flex-col gap-y-2">
                     <div className="flex flex-col gap-y-2">
                         <p className="font-semibold text-gray-600">General Information</p>
@@ -113,7 +110,7 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
 
                     <Separator
                         orientation="horizontal"
-                        className="my-2 w-full bg-slate-200"
+                        className="my-2 w-full "
                     />
 
                     <div className="flex flex-col gap-y-2">
@@ -138,59 +135,59 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
                                     <TableCell className="w-[250px]">End:</TableCell>
                                     <TableCell>{form.watch('end_time')}</TableCell>
                                 </TableRow>
-                                
+
                             </TableBody>
                         </Table>
                     </div>
 
                     {form.watch('additional_date_information').length > 0 && (
                         <>
-                        <Separator
-                        orientation="horizontal"
-                        className="my-2 w-full bg-slate-200"
-                        />
-                        
-                        <div className="flex flex-col gap-y-2">
-                        <p className="font-semibold">Recurring Dates</p>
-                        <Table>
-                            <TableHeader></TableHeader>
-                            <TableBody>
-                            <TableRow>
-                                    <TableCell className="w-[250px]">Additional Date:</TableCell>
-                                    <TableCell
-                                    
-                                    >{form.watch('additional_date_information').map(({additonal_date_data, additonal_date_end, additonal_date_start, index}: {
-                                        additonal_date_data: any
-                                        additonal_date_start: string
-                                        additonal_date_end: string
-                                        index: number
+                            <Separator
+                                orientation="horizontal"
+                                className="my-2 w-full "
+                            />
 
-                                    }) => {
-                                        let date = additonal_date_data.toString().split(' ')
-                                        
-                                        return (    
-                                         <TableRow
-                                         key={index}
+                            <div className="flex flex-col gap-y-2">
+                                <p className="font-semibold">Recurring Dates</p>
+                                <Table>
+                                    <TableHeader></TableHeader>
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell className="w-[250px]">Additional Date:</TableCell>
+                                            <TableCell
 
-                                         >
-                                               <div> {date[1]} {date[2]}, {date[3]}  {additonal_date_start} - {additonal_date_end}</div>
-                                         </TableRow>
-                                        )
-                                    })}</TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                        </div>
+                                            >{form.watch('additional_date_information').map(({ additonal_date_data, additonal_date_end, additonal_date_start, index }: {
+                                                additonal_date_data: any
+                                                additonal_date_start: string
+                                                additonal_date_end: string
+                                                index: number
+
+                                            }) => {
+                                                let date = additonal_date_data.toString().split(' ')
+
+                                                return (
+                                                    <TableRow
+                                                        key={index}
+
+                                                    >
+                                                        <div> {date[1]} {date[2]}, {date[3]}  {additonal_date_start} - {additonal_date_end}</div>
+                                                    </TableRow>
+                                                )
+                                            })}</TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            </div>
                         </>
                     )}
 
-                  
 
-                    
+
+
 
                     <Separator
                         orientation="horizontal"
-                        className="my-2 w-full bg-slate-200"
+                        className="my-2 w-full "
                     />
 
                     <div className="flex flex-col gap-y-2">
@@ -209,7 +206,7 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className="w-[250px]">End</TableCell>
-                                    <TableCell>{form.watch('start_time')}</TableCell>
+                                    <TableCell>{form.watch('dry_run_end_time') ? form.watch('dry_run_end_time') : "None"}</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className="w-[250px]">Assistance</TableCell>
@@ -222,11 +219,11 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
 
                                         <TableCell>
                                             <TableRow>
-                                            <div className="flex font-semibold text-xs flex-row overflow-x-auto gap-x-4 ">
-                                            <p className="w-[200px]">Name</p>
-                                            <p className="w-[200px]">Email</p>
-                                            
-                                            </div>
+                                                <div className="flex font-semibold text-xs flex-row overflow-x-auto gap-x-4 ">
+                                                    <p className="w-[200px]">Name</p>
+                                                    <p className="w-[200px]">Email</p>
+
+                                                </div>
                                                 <div className="flex capitalize flex-col">
                                                     {tcetAssitance.map((panel: { name: string; email: string }) => (
                                                         <div key={panel.name} className="flex flex-row overflow-x-auto w-full items-center justify-center gap-x-4 ">
@@ -246,7 +243,7 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
 
                     <Separator
                         orientation="horizontal"
-                        className="my-2 w-full bg-slate-200"
+                        className="my-2 w-full "
                     />
 
                     <div className="flex flex-col gap-y-2">
@@ -258,7 +255,7 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
                             <TableBody>
                                 <TableRow>
                                     <TableCell className="w-[250px]">Meeting Type</TableCell>
-                                    <TableCell>{dryrun}</TableCell>
+                                    <TableCell className="capitalize">{form.watch('meeting_type_option')}</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className="flex  w-[250px]">Meeting Service</TableCell>
@@ -280,16 +277,16 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
                                     <TableRow>
                                         <TableCell className="w-[250px] flex">Panelist(s)</TableCell>
                                         <TableCell>
-                                        <div className="flex font-semibold text-xs flex-row overflow-x-auto  ">
-                                                 <p className="w-[200px]">Name</p>
-                                                 <p className="w-[200px]">Email</p>
-                                            
+                                            <div className="flex font-semibold text-xs flex-row overflow-x-auto  ">
+                                                <p className="w-[200px]">Name</p>
+                                                <p className="w-[200px]">Email</p>
+
                                             </div>
                                             <div className="flex capitalize flex-col">
                                                 {showPanelist.map((panel: { name: string; email: string }) => (
-                                                        <div key={panel.name} className="flex flex-row overflow-x-auto w-full  ">
-                                                         <p className="w-[200px]">{panel.name}</p>
-                                                         <p className="w-[200px]">{panel.email}</p>
+                                                    <div key={panel.name} className="flex flex-row overflow-x-auto w-full  ">
+                                                        <p className="w-[200px]">{panel.name}</p>
+                                                        <p className="w-[200px]">{panel.email}</p>
                                                     </div>
                                                 ))}
                                             </div>
@@ -301,13 +298,13 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
                                         <TableCell className="w-[250px] flex">Reminder(s) Email</TableCell>
                                         <TableCell>
                                             <div className="flex capitalize flex-col">
-                                                {reminderExisting.map((item:any) => (
+                                                {reminderExisting.map((item: any) => (
                                                     <div key={item} className="flex flex-row overflow-x-auto gap-x-4 ">
-                                                       <div className="flex items-center space-y-2 space-x-2">
-                                                            <Checkbox id={item} checked={true}  className="mr-2" />
+                                                        <div className="flex items-center space-y-2 space-x-2">
+                                                            <Checkbox id={item} checked={true} className="mr-2" />
                                                             {item}
 
-                                                            </div>
+                                                        </div>
                                                     </div>
                                                 ))}
                                             </div>
@@ -322,10 +319,10 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
 
                             </TableBody>
                         </Table>
-                    </div> 
+                    </div>
                 </div>
-            </ScrollArea>
-        </div>
+            </div>
+        </ScrollArea>
     );
 };
 

@@ -333,7 +333,7 @@ const columns: ColumnDef<OverviewTableRow>[] = [
   },
   {
     accessorKey: "editedBy",
-    header: "Edited By",
+    header: "Assisted By",
     cell: ({row}) => {
       return (
         <>{row.original.editedBy}</>

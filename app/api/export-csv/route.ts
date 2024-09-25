@@ -7,7 +7,7 @@ const getHistoryDataSchema = z.object({
   timeframe: z.enum(['month', 'year']),
   month: z.coerce.number().min(0).max(11).default(0),
   year: z.coerce.number().min(2000).max(3000),
-  services: z.enum(["meeting", "webinar", "hybrid", "documentation", "training", "events"])
+  services: z.enum(["all", "meeting", "webinar", "hybrid", "documentation", "training", "events"])
 });
 
 
@@ -87,8 +87,10 @@ interface DepartmentCounts {
   OSMA: number;
   PRPO: number;
   SAC: number;
+  GC: number;
   URDC: number;
   VPAA: number;
+  GS: number;
 }
 
 
@@ -98,7 +100,7 @@ interface DepartmentCounts {
 const statusFilters = ['done', 'cancel']; // List of statuses to include
 
 async function getMonthZoomData(year: number, month: number, services: Services) {
-  const departments = ['CAHS', 'CASE', 'CBMA', 'CEIS', 'CHTM', 'CMT', 'SLCN', 'THS', 'AIRGEO', 'CHAPLAIN', 'TGCC', 'OAR', 'OP', 'OSMA', 'PRPO', 'SAC', 'URDC', 'VPAA']
+  const departments = ['CAHS', 'CASE', 'CBMA', 'CEIS', 'CHTM', 'CMT', 'SLCN', 'THS', 'AIRGEO', 'CHAPLAIN', 'TGCC', 'OAR', 'OP', 'OSMA', 'PRPO', 'SAC', 'GC','URDC', 'GS','VPAA']
 
   const results = await Promise.all(
     departments.map(department =>
@@ -108,11 +110,10 @@ async function getMonthZoomData(year: number, month: number, services: Services)
           year,
           month: month + 1,
           soft_delete_scheduleDate: false,
-          //meeting_type_option: services,
           appointment: {
             soft_delete: false,
             department,
-            meeting_type_option: services,
+            ...(services !== 'all' && { meeting_type_option: services }),
             status: {
               in: statusFilters
             },
@@ -136,7 +137,7 @@ async function getMonthZoomData(year: number, month: number, services: Services)
   for (let day = 0; day <= daysInMonth1; day++) {
     departments.forEach((department, index) => {
       const dayData = results[index].find(item => item.day === day);
-      departmentCounts[department][day + 1] = dayData ? dayData._count._all : 0;
+      departmentCounts[department][day ] = dayData ? dayData._count._all : 0;
     });
   }
 

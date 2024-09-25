@@ -1,8 +1,9 @@
 'use client'
 
-import { ArrowRightFromLine, BarChart, CalendarDays, LayoutDashboard, Menu, Minus, Plus, Table } from "lucide-react"
+import { ArrowRightFromLine, BarChart, CalendarDays, LayoutDashboard, Menu, Minus, Plus, Table,LogOut } from "lucide-react"
 
 import { Button, buttonVariants } from "@/components/ui/button"
+import { logout } from "./_actions/logout"
 
 import { useState } from "react"
 import { usePathname } from "next/navigation"
@@ -15,11 +16,13 @@ import { Separator } from "./ui/separator"
 
 export function SideBar() {
   const [isOpen, setIsOpen] = useState(false)
-
+  const onClick = () => {
+    logout()
+}
 
   return (
     <div className="h-full w-[80px] hidden md:flex shadow-xl overflow-y-auto flex-shrink-0">
-      <div className="h-full w-full flex flex-col items-center gap-y-2 py-4">
+      <div className=" relative h-full w-full flex flex-col items-center gap-y-2 py-4">
 
         <Hint
           label="Appointment"
@@ -78,6 +81,21 @@ export function SideBar() {
             </Button>
           </Link>
         </Hint>
+      
+      <div className="absolute bottom-2">
+      <Hint
+          label="Logout "
+          asChild
+          side="right"
+        >
+            <Button
+              variant="ghost"
+              onClick={onClick}
+            >
+              <LogOut className='h-8 w-8 ' />
+            </Button>
+        </Hint>
+      </div>
       </div>
     </div>
   )

@@ -7,7 +7,7 @@ const getHistoryDataSchema = z.object({
   timeframe: z.enum(['month', 'year']),
   month: z.coerce.number().min(0).max(11).default(0),
   year: z.coerce.number().min(2000).max(3000),
-  services: z.enum(["meeting", "webinar", "hybrid", "documentation", "training", "events"])
+  services: z.enum(["all","meeting", "webinar", "hybrid", "documentation", "training", "events"])
 })
 
 
@@ -140,7 +140,7 @@ async function getMonthHistoryData(year: number, month: number, services: Servic
           appointment: {
             soft_delete: false,
             status,
-            meeting_type_option: services
+            ...(services !== 'all' && { meeting_type_option: services }),
 
           }
         },

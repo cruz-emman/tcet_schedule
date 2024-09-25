@@ -120,7 +120,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
       dry_run_date: undefined,
       dry_run_start_time: '',
       dry_run_end_time: '',
-      does_have_assistance: ["tcet"],
+      does_have_assistance: ["none"],
       name_of_assistance: [],
       // //Step 4
       meeting_type_option: 'meeting',
@@ -334,11 +334,11 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                     <FormItem>
                       <FormLabel>College / Unit (required)</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
+                        <FormControl> 
                           <SelectTrigger>
                             <SelectValue placeholder="Select a college / unit" />
                           </SelectTrigger>
-                        </FormControl>
+                      </FormControl>
                         <SelectContent>
                           {departmentOptions.map((item) => (
                             <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
@@ -507,7 +507,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
 
                       {field.value === true && (
                         <FormItem>
-                          <div className="flex flex-col gap-2 pt-2">z
+                          <div className="flex flex-col gap-2 pt-2">
                             <div className="flex flex-col gap-2">
                               <FormField
                                 control={form.control}
@@ -545,10 +545,10 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                                           //   new Date(date) <= new Date()
                                           // } 
                                           // Disable past dates and today's date
-                                          disabled={[
-                                            { before: new Date() },
-                                            { after: pickedDate! }
-                                          ]}
+                                        //  disabled={[
+                                        //     { before: new Date() },
+                                        //     { after: pickedDate! }
+                                        //   ]} 
                                           selected={field.value}
                                           onSelect={field.onChange}
                                           initialFocus
