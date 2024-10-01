@@ -60,7 +60,6 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
     let showReminder = form.watch('reminder')
     let showPanelist = form.watch('panelist')
 
-    console.log(form.watch())
 
     const isReminderExisting = (showReminder: any) => {
         return showReminder.map((reminder: any) => {

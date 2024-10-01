@@ -1,3 +1,6 @@
+"use client";
+
+
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
@@ -38,6 +41,9 @@ import { toast } from 'sonner';
 import { useCurrentUser } from '@/hooks/user-current-user';
 import DynamicInputField from './dynamic-input-field';
 import AdditionalDate from '../../../components/additonal_date';
+import TCETLOGO from '@/public/sample_logo.png'
+import tcet_logo_2 from '@/public/logo2.png'
+import DownloadButton from "./download-pdfbutton";
 
 
 interface Props {
@@ -52,6 +58,9 @@ interface Users {
   name?: string
   email?: string
 }
+
+
+
 
 
 const steps = [
@@ -142,7 +151,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
     //console.log("Fields to validate:", fields);
 
     const isValid = await form.trigger(fields, { shouldFocus: true });
-   // console.log("Validation result:", isValid, form.formState.errors);
+    // console.log("Validation result:", isValid, form.formState.errors);
 
 
     if (!isValid) return;
@@ -165,18 +174,29 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: CreateAppointment,
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success('Your schedule has been submitted upon approval. Kindly wait 1-2 days for your request to be approved working! 🎉', {
         id: "create-appointment"
       })
+
+
+      // Generate PDF document blob
+      // const blob = await pdf(<MyDoc />).toBlob();
+
+      // // Trigger file download  
+      // const link = document.createElement('a');
+      // link.href = URL.createObjectURL(blob);
+      // link.download = 'appointment_schedule.pdf';
+      // link.click();
+
+      // // Clean up the URL object
+      // URL.revokeObjectURL(link.href);
 
       form.reset();
       setStep(0)
       setDialogOpen(false);
       setOpen(false);
       setConfirmAgreement(false)
-
-
 
       queryClient.invalidateQueries({ queryKey: ["appointment"] });
     }
@@ -189,6 +209,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
   const onSubmit = useCallback((values: CreateAppointmentSchemaType) => {
     toast.loading("Creating Appointment...", { id: 'create-appointment' });
     //console.log(values)
+
     mutate(values)
 
 
@@ -334,11 +355,11 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                     <FormItem>
                       <FormLabel>College / Unit (required)</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl> 
+                        <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a college / unit" />
                           </SelectTrigger>
-                      </FormControl>
+                        </FormControl>
                         <SelectContent>
                           {departmentOptions.map((item) => (
                             <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
@@ -545,10 +566,10 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                                           //   new Date(date) <= new Date()
                                           // } 
                                           // Disable past dates and today's date
-                                        //  disabled={[
-                                        //     { before: new Date() },
-                                        //     { after: pickedDate! }
-                                        //   ]} 
+                                          //  disabled={[
+                                          //     { before: new Date() },
+                                          //     { after: pickedDate! }
+                                          //   ]} 
                                           selected={field.value}
                                           onSelect={field.onChange}
                                           initialFocus
@@ -831,7 +852,14 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
             {step == 4 && (
               <div className='flex flex-col  gap-2'>
                 <FinalizeForm form={form} />
+                <DownloadButton
+                    //disabled={!confirmAgreement}
+                    // onClick={form.handleSubmit(onSubmit)}
+                    form={form}
+                  //isPending={isPending}
+                  />
                 <div className="items-top flex space-x-2">
+               
                   <Checkbox id="terms1" onClick={confirmAgreementFuntion} />
                   <div className="grid gap-1.5 leading-none">
                     <label
@@ -861,6 +889,8 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
           <Button onClick={prevStep} disabled={step === 0}>Back</Button>
           {step === steps.length - 1 ? (
             <DialogClose asChild>
+
+
               <Button
                 disabled={!confirmAgreement}
                 onClick={form.handleSubmit(onSubmit)}
@@ -871,6 +901,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                 </div>}
                 {!isPending && "Submit"}
               </Button>
+
             </DialogClose>
 
           ) : (
