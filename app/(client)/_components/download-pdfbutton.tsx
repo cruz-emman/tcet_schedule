@@ -29,7 +29,7 @@ const DownloadButton = ({ form }: any) => {
       ) : (
         <>
         <Loader2 className='animate-spin' />
-        <p>Kindly wait, we&apos;re generating your pdf copy...</p>
+        <p>Kindly wait,  generating your pdf copy...</p>
         </>
         
       )}
