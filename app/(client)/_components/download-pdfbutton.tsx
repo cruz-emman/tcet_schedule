@@ -1,49 +1,40 @@
 'use client'
 import dynamic from 'next/dynamic'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { Download } from 'lucide-react'
-import AppointmentDocument from './appointment-document'
-import { Button } from '@/components/ui/button'
 
-
-const PDFDownloadLink = dynamic(() => import('@react-pdf/renderer').then(mod => mod.PDFDownloadLink), {
-    ssr: false,
-    loading: () => <p>Loading...</p>
-  })
-  
-
+const PDFDownload = dynamic(
+  () => import('./pdf-download-component'),
+  { 
+    loading: () => <Loader2 className='animate-spin' />,
+    ssr: false
+  }
+)
 
 const DownloadButton = ({ form }: any) => {
-    const [isClient, setIsClient] = useState(false)
+  const [showButton, setShowButton] = useState(false)
 
-    useEffect(() => {
-        setIsClient(true)
-    }, [])
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowButton(true)
+    }, 3000) // 3 seconds delay
 
-    return isClient ? (
-        <PDFDownloadLink
-            fileName="Appointment_Schedule"
-            document={
-                <AppointmentDocument 
-                    form={form}
-                />
-            }
-        >
-            <Button
-                variant="default"
-                className='flex gap-2'
-                type='button'
-                size="sm"
-            >
-                <Download />
-                <p>Appointment, download PDF copy</p>
-            </Button>
-        </PDFDownloadLink>
-    ) : (
+    return () => clearTimeout(timer) // Cleanup timer on component unmount
+  }, [])
+
+  return (
+    <>
+      {showButton ? (
+        <PDFDownload form={form} />
+      ) : (
+        <>
         <Loader2 className='animate-spin' />
-    )
+        <p>Kindly wait, we're generating your pdf copy...</p>
+        </>
+        
+      )}
+    </>
+  )
 }
 
 export default DownloadButton

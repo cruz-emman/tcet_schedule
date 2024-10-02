@@ -853,10 +853,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
               <div className='flex flex-col  gap-2'>
                 <FinalizeForm form={form} />
                 <DownloadButton
-                    //disabled={!confirmAgreement}
-                    // onClick={form.handleSubmit(onSubmit)}
                     form={form}
-                  //isPending={isPending}
                   />
                 <div className="items-top flex space-x-2">
                
