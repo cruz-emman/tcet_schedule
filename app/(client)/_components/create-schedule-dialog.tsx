@@ -629,17 +629,22 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                                   <Checkbox
                                     checked={field.value?.includes(item.id)}
                                     onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([
-                                          ...field.value,
-                                          item.id,
-                                        ])
-                                        : field.onChange(
-                                          field.value?.filter(
-                                            (value: any) =>
-                                              value !== item.id
-                                          )
-                                        );
+                                      const currentValue = field.value || [];
+                                      let newValue;
+
+                                      if (item.id === 'none' && checked) {
+                                        // If "None" is checked, uncheck all others
+                                        newValue = ['none'];
+                                      } else if (checked) {
+                                        // If any other option is checked, remove "None" and add the new option
+                                        newValue = currentValue.filter(v => v !== 'none');
+                                        newValue.push(item.id);
+                                      } else {
+                                        // If unchecking, simply remove the item
+                                        newValue = currentValue.filter(v => v !== item.id);
+                                      }
+
+                                      field.onChange(newValue);
                                     }}
                                   />
                                 </FormControl>
@@ -852,11 +857,11 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
             {step == 4 && (
               <div className='flex flex-col  gap-2'>
                 <FinalizeForm form={form} />
-                <DownloadButton
+                {/* <DownloadButton
                     form={form}
-                  />
+                  /> */}
                 <div className="items-top flex space-x-2">
-               
+
                   <Checkbox id="terms1" onClick={confirmAgreementFuntion} />
                   <div className="grid gap-1.5 leading-none">
                     <label

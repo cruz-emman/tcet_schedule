@@ -15,6 +15,8 @@ const config = {
       padding: "2rem",
       screens: {
         "2xl": "1700px",
+        print: { raw: 'print' },  // Define custom print screen breakpoint
+
       },
     },
     extend: {

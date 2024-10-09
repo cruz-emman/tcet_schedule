@@ -1,326 +1,178 @@
-import React from "react";
-
-import {
-    hybridChoice,
-    photoVideoChoice,
-    purposeChoice,
-    zoomMeetingChoice,
-    zoomWebinarChoice,
-} from "@/lib/data";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Label } from "@/components/ui/label";
-import { DateToUTCDate } from "@/lib/helpers";
-import { reminderChoice } from "@/lib/data";
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableFooter,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
+import React, { useRef } from "react";
+import { useReactToPrint } from 'react-to-print';
+import Image from "next/image";
+import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { format, compareAsc, parse, getDate, getYear, getMonth } from "date-fns";
-
+import { reminderChoice } from "@/lib/data";
+import CUSTOMLOGO_1 from '@/public/sample_logo.png';
+import CUSTOMLOGO2 from '@/public/logo2.png';
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface FinalizeFormProps {
     form: any;
 }
 
 const FinalizeForm = ({ form }: FinalizeFormProps) => {
+    const contentRef = useRef<HTMLDivElement>(null);
+    const reactToPrintFn = useReactToPrint({
+        contentRef
+    });
 
-    const event_date = form.watch('event_date')
+    const event_date = form.watch('event_date');
     const formattedDate = format(event_date, 'MMMM dd yyyy');
-    const getServices = form.watch('meeting_type_service')
-    const getDryRun = form.watch('does_have_dry_run')
+    const getServices = form.watch('meeting_type_service');
+    const getDryRun = form.watch('does_have_dry_run');
 
     const returnArray = (data: string[]) => {
-        const result = []; // Initialize an empty array to collect the results
-        for (let i = 0; i < data.length; i++) {
-            result.push(data[i].split("_")[1]); // Split each string and push the second part to the result array
-        }
-        return result; // Return the result array after the loop completes
-    }
-
-    let result = returnArray(getServices)
-
-
-    const checkDryRun = (getDryRun: boolean): string => {
-        return getDryRun === true ? "Yes" : "No/None";
+        return data.map(item => item.split("_")[1]);
     };
 
-    let dryrun = checkDryRun(getDryRun)
-    let tcetAssitance = form.watch('name_of_assistance')
-    let seperateAssistance = form.watch('does_have_assistance')
-
-
-    let showReminder = form.watch('reminder')
-    let showPanelist = form.watch('panelist')
-
+    let result = returnArray(getServices);
+    let dryrun = getDryRun ? "Yes" : "No/None";
+    let tcetAssistance = form.watch('name_of_assistance');
+    let seperateAssistance = form.watch('does_have_assistance');
+    let showReminder = form.watch('reminder');
+    let showPanelist = form.watch('panelist');
 
     const isReminderExisting = (showReminder: any) => {
         return showReminder.map((reminder: any) => {
             const choice = reminderChoice.find(choice => choice.id === reminder);
             return choice ? choice.label : undefined;
-        }).filter((label: string) => label !== undefined); // Filter out any undefined values
-    }
+        }).filter(Boolean);
+    };
 
-    const reminderExisting = isReminderExisting(showReminder)
-
+    const reminderExisting = isReminderExisting(showReminder);
 
     return (
-        <ScrollArea className="h-[300px] md:h-[600px] w-full">
-            <div className="h-[300px] md:h-full w-full  border md:p-4 p-2">
-                <div className="flex flex-col gap-y-2">
-                    <div className="flex flex-col gap-y-2">
-                        <p className="font-semibold text-gray-600">General Information</p>
-                        <Table>
-                            <TableHeader>
-                            </TableHeader>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell className="w-[250px]">Title:</TableCell>
-                                    <TableCell>{form.watch('title')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="w-[250px]">Email:</TableCell>
-                                    <TableCell>{form.watch('email')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="w-[250px]">Full Name:</TableCell>
-                                    <TableCell>{form.watch('fullname')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="w-[250px]">Contact Person:</TableCell>
-                                    <TableCell>{form.watch('contact_person')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="w-[250px]">Department Name:</TableCell>
-                                    <TableCell>{form.watch('department')}</TableCell>
-                                </TableRow>
-                            </TableBody>
+        <ScrollArea className="h-[600px]  border border-gray-300 p-2">
 
-                        </Table>
+            <div ref={contentRef}>
 
+                <div className="p-2 border-2 border-gray-400 m-2">
+                    <div className="flex justify-between items-center mb-4">
+                        <Image src={CUSTOMLOGO_1} className="w-20 h-20 object-contain" alt="logo" />
+                        <div className="text-center">
+                            <p className="text-sm font-bold">TRINITY UNIVERISTY OF ASIA</p>
+                            <p className="text-lg">Trinitian Center for Education and Technology</p>
+                            <p className="text-sm font-semibold">tcet@tua.edu.ph</p>
+                        </div>
+                        <Image src={CUSTOMLOGO2} className="w-20 h-20 object-contain" alt="logo1" />
+                    </div>
+                    <hr className="my-2 bg-black " />
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div className="border-r-2 border-gray-400">
+                            <h3 className="font-bold mb-2 underline">General Information</h3>
+                            <p><strong>Title:</strong> <span className="capitalize">{form.watch('title')}</span> </p>
+                            <p><strong>Email:</strong>  {form.watch('email')}</p>
+                            <p><strong>Full Name:</strong> <span className="capitalize">{form.watch('fullname')}</span> </p>
+                            <p className="capitalize"><strong>Contact Person:</strong> {form.watch('contact_person')}</p>
+                            <p className="capitalize"><strong>Department Name:</strong> {form.watch('department')}</p>
+                        </div>
+                        <div >
+                            <h3 className="font-bold mb-2 underline">Purpose, Date & Time</h3>
+                            <p className="capitalize"><strong>Event Date:</strong> {formattedDate}</p>
+                            <p className="capitalize"><strong>Purpose:</strong> {form.watch('purpose').split('_').join(" ")}</p>
+                            <p className="capitalize"><strong>Start:</strong> {form.watch('start_time')}</p>
+                            <p className="capitalize"><strong>End:</strong> {form.watch('end_time')}</p>
+                        </div>
                     </div>
 
-                    <Separator
-                        orientation="horizontal"
-                        className="my-2 w-full "
-                    />
+                    <hr className="my-2 bg-black " />
 
-                    <div className="flex flex-col gap-y-2">
-                        <p className="font-semibold">Purpose, Date & Time</p>
-                        <Table>
-                            <TableHeader>
-                            </TableHeader>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell className="w-[250px]">Event Date:</TableCell>
-                                    <TableCell>{formattedDate}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="w-[250px]">Purpose:</TableCell>
-                                    <TableCell>{form.watch('purpose').split('_').join(" ")}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="w-[250px]">Start:</TableCell>
-                                    <TableCell>{form.watch('start_time')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="w-[250px]">End:</TableCell>
-                                    <TableCell>{form.watch('end_time')}</TableCell>
-                                </TableRow>
-
-                            </TableBody>
-                        </Table>
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div className="border-r-2 border-gray-400">
+                            <h3 className="font-bold mb-2 underline">Service Features</h3>
+                            <p className="capitalize"><strong>Meeting Type:</strong> {form.watch('meeting_type_option')}</p>
+                            <p className="capitalize"><strong>Meeting Service:</strong> {result.join(', ')}</p>
+                            <p className="capitalize"><strong>Meeting Link:</strong> {form.watch('meeting_type_link') || "None"}</p>
+                            <p className="capitalize"><strong>Camera:</strong> {form.watch('camera_setup').split('Camera')[0] + ' camera' || "None"}</p>
+                        </div>
+                        <div>
+                            <h3 className="font-bold mb-2 underline">Dry Run Information</h3>
+                            <p className="capitalize"><strong>Dry Run:</strong> {dryrun}</p>
+                            <p className="capitalize"><strong>Start:</strong> {form.watch('dry_run_start_time') || "None"}</p>
+                            <p className="capitalize"><strong>End:</strong> {form.watch('dry_run_end_time') || "None"}</p>
+                            <p className="capitalize"><strong>Assistance:</strong> {form.watch('does_have_assistance') ? seperateAssistance.join(', ') : "None"}</p>
+                        </div>
                     </div>
 
-                    {form.watch('additional_date_information').length > 0 && (
+                    {reminderExisting.length > 0 && (
                         <>
-                            <Separator
-                                orientation="horizontal"
-                                className="my-2 w-full "
-                            />
-
-                            <div className="flex flex-col gap-y-2">
-                                <p className="font-semibold">Recurring Dates</p>
-                                <Table>
-                                    <TableHeader></TableHeader>
-                                    <TableBody>
-                                        <TableRow>
-                                            <TableCell className="w-[250px]">Additional Date:</TableCell>
-                                            <TableCell
-
-                                            >{form.watch('additional_date_information').map(({ additonal_date_data, additonal_date_end, additonal_date_start, index }: {
-                                                additonal_date_data: any
-                                                additonal_date_start: string
-                                                additonal_date_end: string
-                                                index: number
-
-                                            }) => {
-                                                let date = additonal_date_data.toString().split(' ')
-
-                                                return (
-                                                    <TableRow
-                                                        key={index}
-
-                                                    >
-                                                        <div> {date[1]} {date[2]}, {date[3]}  {additonal_date_start} - {additonal_date_end}</div>
-                                                    </TableRow>
-                                                )
-                                            })}</TableCell>
-                                        </TableRow>
-                                    </TableBody>
-                                </Table>
+                            <hr className="my-2 bg-black " />
+                            <div className="mb-4">
+                                <h3 className="font-bold mb-2 underline">Reminder(s) Email</h3>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {reminderExisting.map((item: string, index: number) => (
+                                        <div key={index} className="flex items-center space-x-2">
+                                            <Checkbox id={item} checked={true} />
+                                            <label htmlFor={item} className="text-sm">{item}</label>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </>
                     )}
 
+                    <hr className="my-2 bg-black " />
 
+                    <div className="grid grid-cols-2 gap-4 mb-4">
 
+                        {tcetAssistance.length > 0 && (
+                            <>
+                                <div>
+                                    <h3 className="font-bold mb-2 underline">Assistance(s) Name</h3>
+                                    {tcetAssistance.map((assistant: { name: string; email: string }, index: number) => (
+                                        <p key={index}>{assistant.name} - {assistant.email}</p>
+                                    ))}
+                                </div>
+                            </>
+                        )}
 
-
-                    <Separator
-                        orientation="horizontal"
-                        className="my-2 w-full "
-                    />
-
-                    <div className="flex flex-col gap-y-2">
-                        <p className="font-semibold">Dry Run Information</p>
-                        <Table>
-                            <TableHeader>
-                            </TableHeader>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell className="w-[250px]">Dry Run</TableCell>
-                                    <TableCell>{dryrun}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="w-[250px]">Start</TableCell>
-                                    <TableCell>{form.watch('dry_run_start_time') ? form.watch('dry_run_start_time') : "None"}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="w-[250px]">End</TableCell>
-                                    <TableCell>{form.watch('dry_run_end_time') ? form.watch('dry_run_end_time') : "None"}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="w-[250px]">Assistance</TableCell>
-                                    <TableCell>{form.watch('does_have_assistance') ? seperateAssistance.join(', ') : "None"}
-                                    </TableCell>
-                                </TableRow>
-                                {tcetAssitance.length !== 0 && (
-                                    <TableRow>
-                                        <TableCell className="flex w-[250px]">Assistance(s) Name</TableCell>
-
-                                        <TableCell>
-                                            <TableRow>
-                                                <div className="flex font-semibold text-xs flex-row overflow-x-auto gap-x-4 ">
-                                                    <p className="w-[200px]">Name</p>
-                                                    <p className="w-[200px]">Email</p>
-
-                                                </div>
-                                                <div className="flex capitalize flex-col">
-                                                    {tcetAssitance.map((panel: { name: string; email: string }) => (
-                                                        <div key={panel.name} className="flex flex-row overflow-x-auto w-full items-center justify-center gap-x-4 ">
-                                                            <p className="w-[200px]">{panel.name}</p>
-                                                            <p className="w-[200px]">{panel.email}</p>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </TableRow>
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-
+                        {showPanelist.length > 0 && (
+                            <>
+                                <div className="mb-4">
+                                    <h3 className="font-bold mb-2 underline">Panelist(s)</h3>
+                                    {showPanelist.map((panel: { name: string; email: string }, index: number) => (
+                                        <p key={index}>{panel.name} - {panel.email}</p>
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </div>
 
-                    <Separator
-                        orientation="horizontal"
-                        className="my-2 w-full "
-                    />
+                    {/* {tcetAssistance.length > 0 && (
+                        <>
+                            <div>
+                                <h3 className="font-bold mb-2 underline">Assistance(s) Name</h3>
+                                {tcetAssistance.map((assistant: { name: string; email: string }, index: number) => (
+                                    <p key={index}>{assistant.name} - {assistant.email}</p>
+                                ))}
+                            </div>
+                        </>
+                    )}
 
-                    <div className="flex flex-col gap-y-2">
-                        <p className="font-semibold">Service Features</p>
-
-                        <Table>
-                            <TableHeader>
-                            </TableHeader>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell className="w-[250px]">Meeting Type</TableCell>
-                                    <TableCell className="capitalize">{form.watch('meeting_type_option')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="flex  w-[250px]">Meeting Service</TableCell>
-                                    <TableCell>
-                                        <div className="flex capitalize flex-col">
-                                            {result.map((r) => (
-                                                <div key={r}>
-                                                    {r}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="w-[250px]">Meeting Link</TableCell>
-                                    <TableCell>{form.watch('meeting_type_link') ? form.watch('meeting_type_link') : "None"}</TableCell>
-                                </TableRow>
-                                {showPanelist.length !== 0 && (
-                                    <TableRow>
-                                        <TableCell className="w-[250px] flex">Panelist(s)</TableCell>
-                                        <TableCell>
-                                            <div className="flex font-semibold text-xs flex-row overflow-x-auto  ">
-                                                <p className="w-[200px]">Name</p>
-                                                <p className="w-[200px]">Email</p>
-
-                                            </div>
-                                            <div className="flex capitalize flex-col">
-                                                {showPanelist.map((panel: { name: string; email: string }) => (
-                                                    <div key={panel.name} className="flex flex-row overflow-x-auto w-full  ">
-                                                        <p className="w-[200px]">{panel.name}</p>
-                                                        <p className="w-[200px]">{panel.email}</p>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                                {showReminder.length !== 0 && (
-                                    <TableRow>
-                                        <TableCell className="w-[250px] flex">Reminder(s) Email</TableCell>
-                                        <TableCell>
-                                            <div className="flex capitalize flex-col">
-                                                {reminderExisting.map((item: any) => (
-                                                    <div key={item} className="flex flex-row overflow-x-auto gap-x-4 ">
-                                                        <div className="flex items-center space-y-2 space-x-2">
-                                                            <Checkbox id={item} checked={true} className="mr-2" />
-                                                            {item}
-
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-
-                                <TableRow>
-                                    <TableCell className="w-[250px]">Camera</TableCell>
-                                    <TableCell>{form.watch('camera_setup') ? form.watch('camera_setup') : "None"}</TableCell>
-                                </TableRow>
-
-                            </TableBody>
-                        </Table>
-                    </div>
+                    {showPanelist.length > 0 && (
+                        <>
+                            <hr className="my-2 bg-black " />
+                            <div className="mb-4">
+                                <h3 className="font-bold mb-2 underline">Panelist(s)</h3>
+                                {showPanelist.map((panel: { name: string; email: string }, index: number) => (
+                                    <p key={index}>{panel.name} - {panel.email}</p>
+                                ))}
+                            </div>
+                        </>
+                    )} */}
                 </div>
+
             </div>
+
+            <Button type="button"
+                className="mb-5"
+                //@ts-ignore
+                onClick={reactToPrintFn}>
+                Print Form
+            </Button>
         </ScrollArea>
     );
 };

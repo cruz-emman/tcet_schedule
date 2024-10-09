@@ -15,7 +15,7 @@ const TableChart = () => {
 
   return (
     <div className='flex flex-col relative mx-4'>
-      <DateRangePicker
+      <DateRangePicker 
         initialDateFrom={dateRange.from}
         initialDateTo={dateRange.to}
         showCompare={false}

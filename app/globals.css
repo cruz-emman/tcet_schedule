@@ -66,3 +66,27 @@
     display: initial;
   }
 }
+
+/* styles/tailwind.css */
+@layer utilities {
+  @media print {
+    html, body {
+
+    }
+    .grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .p-6 {
+      padding: 10px !important;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  }
+}
