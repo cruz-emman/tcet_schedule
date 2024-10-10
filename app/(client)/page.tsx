@@ -9,6 +9,7 @@ import SkeletonWrapper from '@/components/skeleton-wrapper'
 import { CardEvent } from './_components/card-event'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { format } from 'date-fns'
+import { CardEventDryRun } from './_components/card-event-dryrun'
 
 const ClientDashboard = () => {
   //if nothing is selected right now, get the current date, else choose
@@ -78,7 +79,7 @@ const ClientDashboard = () => {
                     <>
                       <ScrollArea>
                         {selectedDateDryRun.data?.map((item, key) => (
-                          <CardEvent key={key} data={item} />
+                          <CardEventDryRun key={key} data={item} />
                         ))}
 
                       </ScrollArea>
