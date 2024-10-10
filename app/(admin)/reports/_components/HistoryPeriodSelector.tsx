@@ -36,7 +36,6 @@ const HistoryPeriodSelector = ({
             <SkeletonWrapper isLoading={historyPeriods.isLoading} fullWidth={false}>
                 <Tabs value={timeFrame} onValueChange={(value) => setTimeFrame(value as TimeFrame)}>
                     <TabsList>
-                        <TabsTrigger value='year'>Year</TabsTrigger>
                         <TabsTrigger value='month'>Month</TabsTrigger>
                     </TabsList>
                 </Tabs>

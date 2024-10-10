@@ -67,18 +67,20 @@ const History = () => {
 
   const dataAvailable = historyDataQuery.data && historyDataQuery.data.length > 0;
 
+
+
+
+
   const handleExportExcel = () => {
     const data = zoomDataQuery.data.data;
     const month = zoomDataQuery.data.month;
-    
-
-
+  
     // Get the departments
-   const departments = Object.keys(data);
+    const departments = Object.keys(data);
     
     // Get the number of days in the month
-    const daysInMonth = Object.keys(data[departments[0]]).length;
-
+    const daysInMonth = getDaysInMonth(new Date())
+  
     // Create the header row
     const header: (string | number)[] = ["Department", ...Array.from({length: daysInMonth}, (_, i) => i + 1), "Department Total"];
     
@@ -88,17 +90,21 @@ const History = () => {
       let deptTotal = 0;
       
       for (let i = 1; i <= daysInMonth; i++) {
-        const value = data[dept][i.toString()] || 0;
+        const value = data[dept][i.toString()] || null;
         row.push(value);
-        deptTotal += value;
+        deptTotal += value || 0;
       }
       
       row.push(deptTotal);
       return row;
     });
-
-    console.log(rows)
+  
+    // Calculate the sum of the AG column (index 32 if AG is the 33rd column)
+    const agColumnSum = rows.slice(1, 21).reduce((sum, row) => sum + (row[32] as number || 0), 0);
     
+    // Add a row for the AG column sum
+    rows.push(["", ...Array(daysInMonth).fill(""), agColumnSum]);
+  
     // Create a new workbook and worksheet
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
@@ -119,6 +125,7 @@ const History = () => {
     // Export the Excel file
     XLSX.writeFile(wb, `${month}_DEPARTMENT_REPORT.xlsx`);
   };
+  
 
 
   return (

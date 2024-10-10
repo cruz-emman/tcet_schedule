@@ -81,9 +81,9 @@ const AdditionalDate = ({ control, name, pickedDate, label }: Props) => {
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      // disabled={[
-                      //   { before: new Date() },
-                      // ]}
+                      disabled={[
+                        { before: new Date() },
+                      ]}
                       initialFocus
                     />
                   </PopoverContent>

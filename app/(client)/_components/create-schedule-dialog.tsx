@@ -566,10 +566,10 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                                           //   new Date(date) <= new Date()
                                           // } 
                                           // Disable past dates and today's date
-                                          //  disabled={[
-                                          //     { before: new Date() },
-                                          //     { after: pickedDate! }
-                                          //   ]} 
+                                           disabled={[
+                                              { before: new Date() },
+                                              { after: pickedDate! }
+                                            ]} 
                                           selected={field.value}
                                           onSelect={field.onChange}
                                           initialFocus
