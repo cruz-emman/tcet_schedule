@@ -42,23 +42,7 @@ const LeftCalendar = ({ date, setDate }: Props) => {
           <CalendarClock />
           <span className=''>{`${format(new Date(), 'MM/dd/yyyy')}`}</span>
         </div>
-        {/* 
-        <div className='flex flex-grow gap-x-5 items-center '>
-          <h1 className='text-xs font-bold'>Legends: </h1>
-          <div className='flex items-center justify-center'>
-            <div className='w-5 h-5 rounded-full mr-1 bg-green-500' />
-            <span className='text-xs'>Available</span>
-          </div>
-          <div className='flex items-center justify-center'>
-            <div className='w-5 h-5 rounded-full mr-1 bg-orange-500' />
-            <span className='text-xs'>Almost Full</span>
-          </div>
-          <div className='flex items-center justify-center'>
-            <div className='w-5 h-5 rounded-full mr-1 bg-red-500' />
-            <span className='text-xs'>Fully Booked</span>
-          </div>
-        </div>
-        */}
+
 
       </div>
 

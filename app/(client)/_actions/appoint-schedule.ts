@@ -26,6 +26,7 @@ export async function CreateAppointment(form: CreateAppointmentSchemaType) {
     const tcet_assistance = does_have_assistance.join();
     const meeting_service = meeting_type_service.join();
     const event_actual_date = DateToUTCDate(event_date);
+    const dryRunDate = dry_run_date ? DateToUTCDate(dry_run_date) : null;
 
 
     const currentReminder = reminder ? reminder.join(',') : '';
@@ -41,7 +42,7 @@ export async function CreateAppointment(form: CreateAppointmentSchemaType) {
                     purpose,
                     venue,
                     does_have_dry_run,
-                    dry_run_date,
+                    dry_run_date: dryRunDate,
                     dry_run_start_time,
                     dry_run_end_time,
                     does_have_assistance: tcet_assistance,

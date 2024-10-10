@@ -13,17 +13,13 @@ export async function GET(request: Request) {
         })
     }
 
-
-
-    const result = await getSelectedDate(queryParams.data.currentDate)
-    console
-
+    const result = await getSelectedDateDryRun(queryParams.data.currentDate)
     return Response.json(result)
 }
 
-export type GetSelectedDateResponseType = Awaited<ReturnType<typeof getSelectedDate>>
+export type GetSelectedDateResponseType = Awaited<ReturnType<typeof getSelectedDateDryRun>>
 
-async function getSelectedDate(currentDate: Date) {
+async function getSelectedDateDryRun(currentDate: Date) {
     
     const start = startOfDay(currentDate)
     const end = endOfDay(currentDate)
@@ -31,11 +27,12 @@ async function getSelectedDate(currentDate: Date) {
     
     const getData = await db.appointment.findMany({
         where:{
-            event_date:{
+            dry_run_date:{
                 gte: start,
                 lte: end,
             },
             status: 'approved',
+            does_have_dry_run: true,
         },
         orderBy: {
             event_date: 'desc'

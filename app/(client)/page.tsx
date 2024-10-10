@@ -27,12 +27,13 @@ const ClientDashboard = () => {
 
   })
 
+  const selectedDateDryRun = useQuery<GetSelectedDateResponseType>({
+    queryKey: ['data', 'history', 'dryRun', date],
+    //@ts-ignores
+  queryFn: () => fetch(`/api/data-dry-run?currentDate=${date.toISOString()}`).then((res) => res.json()),
+    enabled: !!date,
 
-
-
-  const dry_run_false = selectedDate.data?.dry_run_false
-  const dry_run_true = selectedDate.data?.dry_run_true
-
+  })
 
 
 
@@ -49,12 +50,12 @@ const ClientDashboard = () => {
               <h1 className="text-lg font-semibold text-gray-400">Event Today</h1>
               <div className="h-full flex max-h-[650px] overflow-y-auto flex-col gap-y-2 flex-grow ">
                 <SkeletonWrapper isLoading={selectedDate.isFetching}>
-                  {dry_run_false?.length === 0 ? (
+                  {selectedDate.data?.length === 0 ? (
                     <p>No event today</p>
                   ) : (
                     <>
                       <ScrollArea>
-                        {dry_run_false?.map((item, key) => (
+                        {selectedDate.data?.map((item, key) => (
                           <CardEvent key={key} data={item} />
                         ))}
                       </ScrollArea>
@@ -68,21 +69,22 @@ const ClientDashboard = () => {
             <div className="flex flex-col flex-1 w-full ">
               <h1 className="text-lg font-semibold  text-gray-400">Dry Run</h1>
               <div className="h-full flex max-h-[650px] bg overflow-y-auto flex-col gap-y-2 flex-grow md:min-h-[600px] min-h-full ">
-                <SkeletonWrapper isLoading={selectedDate.isFetching}>
-                  {dry_run_true?.length === 0 ? (
+                <SkeletonWrapper isLoading={selectedDateDryRun.isFetching}>
+
+
+                  {selectedDateDryRun.data?.length === 0 ? (
                     <p>No event today</p>
                   ) : (
-
                     <>
                       <ScrollArea>
-                        {dry_run_true?.map((item, key) => (
-
+                        {selectedDateDryRun.data?.map((item, key) => (
                           <CardEvent key={key} data={item} />
-
                         ))}
+
                       </ScrollArea>
                     </>
                   )}
+
 
                 </SkeletonWrapper>
               </div>

@@ -23,7 +23,7 @@ type Props = {
 
 export const CardEvent = ({ data }: Props) => {
   return (
-    <Card>
+    <Card className="w-10/12">
       <CardHeader>
         <CardTitle>{data?.title}</CardTitle>
         <CardDescription className="capitalize">{data?.meeting_type_option}</CardDescription>

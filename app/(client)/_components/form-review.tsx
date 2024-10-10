@@ -20,9 +20,12 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
     });
 
     const event_date = form.watch('event_date');
+    const dryrun_date = form.watch('dry_run_date')
     const formattedDate = format(event_date, 'MMMM dd yyyy');
+    const formattedDryRunDate = format(dryrun_date, 'MMMM dd yyyy')
     const getServices = form.watch('meeting_type_service');
     const getDryRun = form.watch('does_have_dry_run');
+
 
     const returnArray = (data: string[]) => {
         return data.map(item => item.split("_")[1]);
@@ -91,6 +94,7 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
                         <div>
                             <h3 className="font-bold mb-2 underline">Dry Run Information</h3>
                             <p className="capitalize"><strong>Dry Run:</strong> {dryrun}</p>
+                            <p className="capitalize"><strong>Dry Run Date:</strong> {formattedDryRunDate}</p>
                             <p className="capitalize"><strong>Start:</strong> {form.watch('dry_run_start_time') || "None"}</p>
                             <p className="capitalize"><strong>End:</strong> {form.watch('dry_run_end_time') || "None"}</p>
                             <p className="capitalize"><strong>Assistance:</strong> {form.watch('does_have_assistance') ? seperateAssistance.join(', ') : "None"}</p>
