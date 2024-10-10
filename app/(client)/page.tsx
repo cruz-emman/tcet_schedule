@@ -73,7 +73,7 @@ const ClientDashboard = () => {
 
 
                   {selectedDateDryRun.data?.length === 0 ? (
-                    <p>No event today</p>
+                    <p className=''>No event today</p>
                   ) : (
                     <>
                       <ScrollArea>

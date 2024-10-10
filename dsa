@@ -1,0 +1,266 @@
+[33mcommit e76199acdb55880418ea23cc63ca7cd0e65e11a9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Emman Cruz <emmancruz2000@gmail.com>
+Date:   Thu Oct 10 15:38:04 2024 +0800
+
+    appointment updated
+
+[1mdiff --git a/app/(client)/_actions/appoint-schedule.ts b/app/(client)/_actions/appoint-schedule.ts[m
+[1mindex d06222a..a23cded 100644[m
+[1m--- a/app/(client)/_actions/appoint-schedule.ts[m
+[1m+++ b/app/(client)/_actions/appoint-schedule.ts[m
+[36m@@ -26,6 +26,7 @@[m [mexport async function CreateAppointment(form: CreateAppointmentSchemaType) {[m
+     const tcet_assistance = does_have_assistance.join();[m
+     const meeting_service = meeting_type_service.join();[m
+     const event_actual_date = DateToUTCDate(event_date);[m
+[32m+[m[32m    const dryRunDate = dry_run_date ? DateToUTCDate(dry_run_date) : null;[m
+ [m
+ [m
+     const currentReminder = reminder ? reminder.join(',') : '';[m
+[36m@@ -41,7 +42,7 @@[m [mexport async function CreateAppointment(form: CreateAppointmentSchemaType) {[m
+                     purpose,[m
+                     venue,[m
+                     does_have_dry_run,[m
+[31m-                    dry_run_date,[m
+[32m+[m[32m                    dry_run_date: dryRunDate,[m
+                     dry_run_start_time,[m
+                     dry_run_end_time,[m
+                     does_have_assistance: tcet_assistance,[m
+[1mdiff --git a/app/(client)/_components/card-event.tsx b/app/(client)/_components/card-event.tsx[m
+[1mindex e17ea8a..127251f 100644[m
+[1m--- a/app/(client)/_components/card-event.tsx[m
+[1m+++ b/app/(client)/_components/card-event.tsx[m
+[36m@@ -23,7 +23,7 @@[m [mtype Props = {[m
+ [m
+ export const CardEvent = ({ data }: Props) => {[m
+   return ([m
+[31m-    <Card>[m
+[32m+[m[32m    <Card className="w-10/12">[m
+       <CardHeader>[m
+         <CardTitle>{data?.title}</CardTitle>[m
+         <CardDescription className="capitalize">{data?.meeting_type_option}</CardDescription>[m
+[1mdiff --git a/app/(client)/_components/form-review.tsx b/app/(client)/_components/form-review.tsx[m
+[1mindex 9f18b34..828d32a 100644[m
+[1m--- a/app/(client)/_components/form-review.tsx[m
+[1m+++ b/app/(client)/_components/form-review.tsx[m
+[36m@@ -20,10 +20,13 @@[m [mconst FinalizeForm = ({ form }: FinalizeFormProps) => {[m
+     });[m
+ [m
+     const event_date = form.watch('event_date');[m
+[32m+[m[32m    const dryrun_date = form.watch('dry_run_date')[m
+     const formattedDate = format(event_date, 'MMMM dd yyyy');[m
+[32m+[m[32m    const formattedDryRunDate = format(dryrun_date, 'MMMM dd yyyy')[m
+     const getServices = form.watch('meeting_type_service');[m
+     const getDryRun = form.watch('does_have_dry_run');[m
+ [m
+[32m+[m
+     const returnArray = (data: string[]) => {[m
+         return data.map(item => item.split("_")[1]);[m
+     };[m
+[36m@@ -91,6 +94,7 @@[m [mconst FinalizeForm = ({ form }: FinalizeFormProps) => {[m
+                         <div>[m
+                             <h3 className="font-bold mb-2 underline">Dry Run Information</h3>[m
+                             <p className="capitalize"><strong>Dry Run:</strong> {dryrun}</p>[m
+[32m+[m[32m                            <p className="capitalize"><strong>Dry Run Date:</strong> {formattedDryRunDate}</p>[m
+                             <p className="capitalize"><strong>Start:</strong> {form.watch('dry_run_start_time') || "None"}</p>[m
+                             <p className="capitalize"><strong>End:</strong> {form.watch('dry_run_end_time') || "None"}</p>[m
+                             <p className="capitalize"><strong>Assistance:</strong> {form.watch('does_have_assistance') ? seperateAssistance.join(', ') : "None"}</p>[m
+[1mdiff --git a/app/(client)/_components/left-calendar.tsx b/app/(client)/_components/left-calendar.tsx[m
+[1mindex 2798c9a..d80f7e3 100644[m
+[1m--- a/app/(client)/_components/left-calendar.tsx[m
+[1m+++ b/app/(client)/_components/left-calendar.tsx[m
+[36m@@ -42,23 +42,7 @@[m [mconst LeftCalendar = ({ date, setDate }: Props) => {[m
+           <CalendarClock />[m
+           <span className=''>{`${format(new Date(), 'MM/dd/yyyy')}`}</span>[m
+         </div>[m
+[31m-        {/* [m
+[31m-        <div className='flex flex-grow gap-x-5 items-center '>[m
+[31m-          <h1 className='text-xs font-bold'>Legends: </h1>[m
+[31m-          <div className='flex items-center justify-center'>[m
+[31m-            <div className='w-5 h-5 rounded-full mr-1 bg-green-500' />[m
+[31m-            <span className='text-xs'>Available</span>[m
+[31m-          </div>[m
+[31m-          <div className='flex items-center justify-center'>[m
+[31m-            <div className='w-5 h-5 rounded-full mr-1 bg-orange-500' />[m
+[31m-            <span className='text-xs'>Almost Full</span>[m
+[31m-          </div>[m
+[31m-          <div className='flex items-center justify-center'>[m
+[31m-            <div className='w-5 h-5 rounded-full mr-1 bg-red-500' />[m
+[31m-            <span className='text-xs'>Fully Booked</span>[m
+[31m-          </div>[m
+[31m-        </div>[m
+[31m-        */}[m
+[32m+[m
+ [m
+       </div>[m
+ [m
+[1mdiff --git a/app/(client)/page.tsx b/app/(client)/page.tsx[m
+[1mindex 3b08cc3..2477806 100644[m
+[1m--- a/app/(client)/page.tsx[m
+[1m+++ b/app/(client)/page.tsx[m
+[36m@@ -27,12 +27,13 @@[m [mconst ClientDashboard = () => {[m
+ [m
+   })[m
+ [m
+[32m+[m[32m  const selectedDateDryRun = useQuery<GetSelectedDateResponseType>({[m
+[32m+[m[32m    queryKey: ['data', 'history', 'dryRun', date],[m
+[32m+[m[32m    //@ts-ignores[m
+[32m+[m[32m  queryFn: () => fetch(`/api/data-dry-run?currentDate=${date.toISOString()}`).then((res) => res.json()),[m
+[32m+[m[32m    enabled: !!date,[m
+ [m
+[31m-[m
+[31m-[m
+[31m-  const dry_run_false = selectedDate.data?.dry_run_false[m
+[31m-  const dry_run_true = selectedDate.data?.dry_run_true[m
+[31m-[m
+[32m+[m[32m  })[m
+ [m
+ [m
+ [m
+[36m@@ -49,12 +50,12 @@[m [mconst ClientDashboard = () => {[m
+               <h1 className="text-lg font-semibold text-gray-400">Event Today</h1>[m
+               <div className="h-full flex max-h-[650px] overflow-y-auto flex-col gap-y-2 flex-grow ">[m
+                 <SkeletonWrapper isLoading={selectedDate.isFetching}>[m
+[31m-                  {dry_run_false?.length === 0 ? ([m
+[32m+[m[32m                  {selectedDate.data?.length === 0 ? ([m
+                     <p>No event today</p>[m
+                   ) : ([m
+                     <>[m
+                       <ScrollArea>[m
+[31m-                        {dry_run_false?.map((item, key) => ([m
+[32m+[m[32m                        {selectedDate.data?.map((item, key) => ([m
+                           <CardEvent key={key} data={item} />[m
+                         ))}[m
+                       </ScrollArea>[m
+[36m@@ -68,22 +69,23 @@[m [mconst ClientDashboard = () => {[m
+             <div className="flex flex-col flex-1 w-full ">[m
+               <h1 className="text-lg font-semibold  text-gray-400">Dry Run</h1>[m
+               <div className="h-full flex max-h-[650px] bg overflow-y-auto flex-col gap-y-2 flex-grow md:min-h-[600px] min-h-full ">[m
+[31m-                <SkeletonWrapper isLoading={selectedDate.isFetching}>[m
+[31m-                  {dry_run_true?.length === 0 ? ([m
+[32m+[m[32m                <SkeletonWrapper isLoading={selectedDateDryRun.isFetching}>[m
+[32m+[m
+[32m+[m
+[32m+[m[32m                  {selectedDateDryRun.data?.length === 0 ? ([m
+                     <p>No event today</p>[m
+                   ) : ([m
+[31m-[m
+                     <>[m
+                       <ScrollArea>[m
+[31m-                        {dry_run_true?.map((item, key) => ([m
+[31m-[m
+[32m+[m[32m                        {selectedDateDryRun.data?.map((item, key) => ([m
+                           <CardEvent key={key} data={item} />[m
+[31m-[m
+                         ))}[m
+[32m+[m
+                       </ScrollArea>[m
+                     </>[m
+                   )}[m
+ [m
+[32m+[m
+                 </SkeletonWrapper>[m
+               </div>[m
+             </div>[m
+[1mdiff --git a/app/api/data-calendar/route.ts b/app/api/data-calendar/route.ts[m
+[1mindex a32d250..59bb956 100644[m
+[1m--- a/app/api/data-calendar/route.ts[m
+[1m+++ b/app/api/data-calendar/route.ts[m
+[36m@@ -27,29 +27,15 @@[m [masync function getSelectedDate(currentDate: Date) {[m
+     [m
+     const start = startOfDay(currentDate)[m
+     const end = endOfDay(currentDate)[m
+[31m-    const dry_run_false = await db.appointment.findMany({[m
+[31m-        where: {[m
+[31m-            event_date: {[m
+[31m-                gte: start,[m
+[31m-                lte: end[m
+[31m-            },[m
+[31m-            does_have_dry_run: false,[m
+[31m-            status: 'approved'[m
+[31m-        },[m
+[31m-        orderBy: {[m
+[31m-            event_date: 'desc'[m
+[31m-        }[m
+[31m-    })[m
+[31m-[m
+ [m
+[31m-    const dry_run_true = await db.appointment.findMany({[m
+[31m-        where: {[m
+[31m-            event_date: {[m
+[32m+[m[41m    [m
+[32m+[m[32m    const getData = await db.appointment.findMany({[m
+[32m+[m[32m        where:{[m
+[32m+[m[32m            event_date:{[m
+                 gte: start,[m
+[31m-                lte: end[m
+[32m+[m[32m                lte: end,[m
+             },[m
+[31m-            does_have_dry_run: true,[m
+[31m-            status: 'approved'[m
+[32m+[m[32m            status: 'approved',[m
+         },[m
+         orderBy: {[m
+             event_date: 'desc'[m
+[36m@@ -58,8 +44,5 @@[m [masync function getSelectedDate(currentDate: Date) {[m
+ [m
+ [m
+ [m
+[31m-    return {[m
+[31m-        dry_run_false,[m
+[31m-        dry_run_true[m
+[31m-    }[m
+[32m+[m[32m    return getData[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/app/api/data-dry-run/route.ts b/app/api/data-dry-run/route.ts[m
+[1mnew file mode 100644[m
+[1mindex 0000000..94b4d73[m
+[1m--- /dev/null[m
+[1m+++ b/app/api/data-dry-run/route.ts[m
+[36m@@ -0,0 +1,45 @@[m
+[32m+[m[32mimport { db } from "@/lib/db"[m
+[32m+[m[32mimport { CurrentDateQuerySchema } from "@/schema/overview"[m
+[32m+[m[32mimport { endOfDay, startOfDay } from "date-fns"[m
+[32m+[m
+[32m+[m[32mexport async function GET(request: Request) {[m
+[32m+[m[32m    const { searchParams } = new URL(request.url)[m
+[32m+[m[32m    const currentDate = searchParams.get('currentDate')[m
+[32m+[m[32m    const queryParams = CurrentDateQuerySchema.safeParse({ currentDate })[m
+[32m+[m
+[32m+[m[32m    if (!queryParams.success) {[m
+[32m+[m[32m        return Response.json(queryParams.error.message, {[m
+[32m+[m[32m            status: 400[m
+[32m+[m[32m        })[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    const result = await getSelectedDateDryRun(queryParams.data.currentDate)[m
+[32m+[m[32m    return Response.json(result)[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mexport type GetSelectedDateResponseType = Awaited<ReturnType<typeof getSelectedDateDryRun>>[m
+[32m+[m
+[32m+[m[32masync function getSelectedDateDryRun(currentDate: Date) {[m
+[32m+[m[41m    [m
+[32m+[m[32m    const start = startOfDay(currentDate)[m
+[32m+[m[32m    const end = endOfDay(currentDate)[m
+[32m+[m
+[32m+[m[41m    [m
+[32m+[m[32m    const getData = await db.appointment.findMany({[m
+[32m+[m[32m        where:{[m
+[32m+[m[32m            dry_run_date:{[m
+[32m+[m[32m                gte: start,[m
+[32m+[m[32m                lte: end,[m
+[32m+[m[32m            },[m
+[32m+[m[32m            status: 'approved',[m
+[32m+[m[32m            does_have_dry_run: true,[m
+[32m+[m[32m        },[m
+[32m+[m[32m        orderBy: {[m
+[32m+[m[32m            event_date: 'desc'[m
+[32m+[m[32m        }[m
+[32m+[m[32m    })[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m[32m    return getData[m
+[32m+[m[32m}[m
+\ No newline at end of file[m
