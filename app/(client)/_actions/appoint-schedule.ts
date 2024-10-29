@@ -5,7 +5,7 @@ import { CreateAppointmentSchema, CreateAppointmentSchemaType } from "@/schema/a
 import * as postmark from "postmark"
 
 const serverToken = process.env.NEXT_PUBLIC_POSTMARK_SERVER_TOKEN as string
-const client = new postmark.ServerClient(serverToken)
+const client = new postmark.ServerClient("88cc9bab-730a-41b3-843b-2edcc9d60b39")
 
 export async function CreateAppointment(form: CreateAppointmentSchemaType) {
     const parsedBody = CreateAppointmentSchema.safeParse(form);
