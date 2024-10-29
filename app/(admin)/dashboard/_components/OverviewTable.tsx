@@ -32,7 +32,7 @@ import { DataTableViewOptions } from '@/components/datatable/ColumnToggle';
 import { DataTableFacetedFilter } from '@/components/datatable/FacetedFilter';
 import { MeetingTypeOption, StatusOption } from '@/lib/data';
 import { download, generateCsv, mkConfig } from 'export-to-csv'
-import { Ban, Check, CircleDot, Cross, DownloadIcon, MoreHorizontal, PanelRightCloseIcon, Trash2, UserPlus } from 'lucide-react';
+import { Ban, Check, CircleDot, Cross, DownloadIcon, MoreHorizontal, PanelRightCloseIcon, Printer, Trash2, UserPlus } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useRouter } from 'next/navigation';
 import { ApprovedAppointment } from '../_actions/approved-appointment';
@@ -162,6 +162,10 @@ const ActionCell = ({ row } : any) => {
           <DropdownMenuItem onClick={() => router.push(`edit/${id}`)}>
             <PanelRightCloseIcon className="mr-2 h-4 w-4" />
             View Details
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push(`printPDF/${id}`)}>
+            <Printer className="mr-2 h-4 w-4" />
+            Print Form
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuSub>

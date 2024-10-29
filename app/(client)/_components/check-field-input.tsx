@@ -14,6 +14,7 @@ import DynamicTableField from "./dynamic-table-field";
 import DynamicInputField from "./dynamic-input-field";
 import { reminderChoice } from "@/lib/data";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 
 
 interface CheckboxOption {
@@ -105,7 +106,7 @@ const CheckboxFieldInput = ({
 
 
       <ScrollArea className="h-72 ">
-      <Separator className="my-4" />
+        <Separator className="my-4" />
         {(openLiveStreaming.includes('webinar_reminder')) && (
           <div className="px-2 pt-5">
             <FormField
@@ -199,17 +200,23 @@ const CheckboxFieldInput = ({
             </div>
           )}
 
-        {openLiveStreaming.includes('training_others') && (
-        <div className="px-2 pt-5">
+        {(  openLiveStreaming.includes('training_others') || 
+            openLiveStreaming.includes('meeting_others') ||
+            openLiveStreaming.includes('webinar_others') ||
+            openLiveStreaming.includes('hybrid_others') ||
+            openLiveStreaming.includes('documentation_others') ||
+            openLiveStreaming.includes('events_others') ) && (
+          <div className="px-2 pt-5">
             <FormField
               control={linkControl}
               name={"other_training"}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Training </FormLabel>
+                  <FormLabel>Additional Information </FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="anything connected with TCET"
+                    <Textarea
+                      placeholder="Add additional requirements"
+                      className="resize-none"
                       {...field}
                     />
                   </FormControl>

@@ -94,9 +94,6 @@ const steps = [
 
 const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
 
-
-
-
   const [dialogOpen, setDialogOpen] = useState(false);
   const [meetingType, setMeetingType] = useState("meeting"); // Optional
   const [confirmAgreement, setConfirmAgreement] = useState(false);
@@ -831,7 +828,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                           trainingName="other_training"
 
                         />
-                      </>
+                    </>
                     )}
 
                     {meetingType === "events" && (
@@ -847,19 +844,14 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                         />
                       </>
                     )}
-
-
-
                   </div>
                 </div>
               </div>
             )}
             {step == 4 && (
-              <div className='flex flex-col  gap-2'>
+              <div className='flex flex-col gap-2'>
                 <FinalizeForm form={form} />
-                {/* <DownloadButton
-                    form={form}
-                  /> */}
+
                 <div className="items-top flex space-x-2">
 
                   <Checkbox id="terms1" onClick={confirmAgreementFuntion} />

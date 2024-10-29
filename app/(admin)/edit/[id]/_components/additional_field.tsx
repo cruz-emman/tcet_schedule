@@ -25,6 +25,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 interface Props {
     control?: any;
     dataServices: String[]
@@ -40,7 +41,6 @@ const AdditionalField = ({
 
 }: Props) => {
     
-
 
     return (
         <>
@@ -117,6 +117,38 @@ const AdditionalField = ({
                                             placeholder="ex. https://www.facebook.com/..."
                                             {...field}
                                         />
+                                    </FormControl>
+
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                )}
+
+
+            {(dataServices.includes("training_others") ||
+                dataServices.includes("meeting_others") ||
+                dataServices.includes("webinar_others") ||
+                dataServices.includes("hybrid_others") ||
+                dataServices.includes("documentation_others") ||
+                dataServices.includes("events_others")
+            ) && (
+                    <div className="px-2 pt-5">
+                        <FormField
+                            control={control}
+                            name={"other_training"}
+                            defaultValue={defaultValues?.other_training}
+
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Additional/Other Input</FormLabel>
+                                    <FormControl>
+                                    <Textarea
+                                    placeholder="Tell us a little bit about yourself"
+                                    className="resize-none"
+                                    {...field}
+                                    />
                                     </FormControl>
 
                                     <FormMessage />

@@ -28,7 +28,8 @@ export async function UpdateAppointment(form: CreateAppointmentSchemaType, id: s
         meeting_type_link,
         camera_setup,
         status,
-        editedBy
+        editedBy,
+        other_training
     } = parsedBody.data
 
     const tcet_assistance = does_have_assistance.join()
@@ -65,6 +66,7 @@ export async function UpdateAppointment(form: CreateAppointmentSchemaType, id: s
                 reminder: currentReminder,
                 meeting_type_link,
                 camera_setup,
+                other_training,
 
 
                 //additional input

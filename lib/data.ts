@@ -25,8 +25,8 @@ export const purposeChoice = [
 
 export const does_have_assistance_choice = [
   {
-    id:'none',
-    label:"None"
+    id: 'none',
+    label: "None"
   },
   {
     id: "tcet",
@@ -67,6 +67,10 @@ export const zoomMeetingChoice = [
   {
     id: 'meeting_hybrid',
     label: "Hybrid"
+  },
+  {
+    id: 'meeting_others',
+    label: 'Others'
   }
 ]
 
@@ -99,6 +103,10 @@ export const zoomWebinarChoice = [
   {
     id: 'webinar_hybrid',
     label: "Hybrid"
+  },
+  {
+    id: 'webinar_others',
+    label: 'Others'
   }
 
 ]
@@ -124,6 +132,10 @@ export const hybridChoice = [
     id: 'hybrid_livestreaming',
     label: 'Livestreaming'
   },
+  {
+    id: 'hybrid_others',
+    label: 'Others'
+  }
 ]
 
 export const photoVideoChoice = [
@@ -138,10 +150,13 @@ export const photoVideoChoice = [
     label: 'Video / Shoot'
   },
   {
-
     id: 'documentation_livestreaming',
     label: 'Live streaming'
   },
+  {
+    id: 'documentation_others',
+    label: 'Others'
+  }
 ]
 export const eventsChoice = [
   {
@@ -158,6 +173,10 @@ export const eventsChoice = [
     id: 'events_livestreaming',
     label: 'Livestreaming'
   },
+  {
+    id: 'events_others',
+    label: 'Others'
+  }
 ]
 
 export const trainingChoice = [
@@ -171,7 +190,6 @@ export const trainingChoice = [
     id: 'training_copyleaks',
     label: 'Copyleaks Training'
   },
-
   {
     id: 'training_others',
     label: 'Others'
@@ -182,7 +200,7 @@ export const reminderChoice = [
   {
     id: 'one_hour',
     label: '1 hour before the start date and time'
-    
+
   },
   {
     id: 'one_day',
@@ -334,38 +352,39 @@ export const MeetingTypeOption = [
   { label: "Hybrid", value: "hybrid", badgeColor: 'bg-red-500' },
   { label: "Documentation", value: "documentation", badgeColor: 'bg-orange-500' },
   { label: "Training", value: "training", badgeColor: 'bg-emerald-500' },
-  { label: 'Events', value: "events", badgeColor: 'bg-rose-500'}
+  { label: 'Events', value: "events", badgeColor: 'bg-rose-500' }
 ]
 
 export const departmentOptions = [
-  {label: 'CAHS (College of Allied Health Sciences)', value: "CAHS"},
-  {label: 'CASE (College of Arts, Sciences, and Education)', value: "CASE"},
-  {label: 'CBMA (College of Business, Management & Accountancy)', value: "CBMA"},
-  {label: 'CEIS (College of Engineering and Information Sciences)', value: "CEIS"},
-  {label: 'CHTM (College of Hospitality and Tourism Management)', value: "CHTM"},
-  {label: 'CMT (College of Medical Technology)', value: "CMT"},
-  {label: 'SLCN (St. Luke College of Nursing)' , value: "SLCN"},
-  {label: 'THS (Trinity High School', value: "THS"},
+  { label: 'CAHS (College of Allied Health Sciences)', value: "CAHS" },
+  { label: 'CASE (College of Arts, Sciences, and Education)', value: "CASE" },
+  { label: 'CBMA (College of Business, Management & Accountancy)', value: "CBMA" },
+  { label: 'CEIS (College of Engineering and Information Sciences)', value: "CEIS" },
+  { label: 'CHTM (College of Hospitality and Tourism Management)', value: "CHTM" },
+  { label: 'CMT (College of Medical Technology)', value: "CMT" },
+  { label: 'SLCN (St. Luke College of Nursing)', value: "SLCN" },
+  { label: 'THS (Trinity High School', value: "THS" },
   //Finish colleges
 
-  {label: 'AIRGEO (Alumni, Industry Relations, and Global Education Office)', value: "AIRGEO"},
-  {label: 'CHAPLAIN', value: "CHAPLAIN"},
-  {label: 'GS (Graduate School)', value: 'GS'},
-  {label: 'OAR (Office of Admission and Registration)', value: "OAR"},
-  {label: 'OP (Office of the president)', value: "OP"},
-  {label: 'OSMA (Quality Assurance and Strategic Management Office)', value: "OSMA"},
-  {label: 'PPRO', value: "PPRO"},
-  {label: 'TGCC (Trinitian Guidance and Career Center)', value: "TGCC"},
-  {label: 'SAC (Student Affairs Center)', value: "SAC"},
-  {label: 'URDC (University Research and Development Center)', value: "URDC"},
-  {label: 'VPAA (Vice President of Academics Affairs)', value: "VPAA"},
+  { label: 'AIRGEO (Alumni, Industry Relations, and Global Education Office)', value: "AIRGEO" },
+  { label: 'CHAPLAIN', value: "CHAPLAIN" },
+  { label: 'GS (Graduate School)', value: 'GS' },
+  { label: 'OAR (Office of Admission and Registration)', value: "OAR" },
+  { label: 'OP (Office of the president)', value: "OP" },
+  { label: 'OSMA (Quality Assurance and Strategic Management Office)', value: "OSMA" },
+  { label: 'PPRO', value: "PPRO" },
+  { label: 'TCET (Trinitian Center For Education and Technology)', value: "TCET" },
+  { label: 'TGCC (Trinitian Guidance and Career Center)', value: "TGCC" },
+  { label: 'SAC (Student Affairs Center)', value: "SAC" },
+  { label: 'URDC (University Research and Development Center)', value: "URDC" },
+  { label: 'VPAA (Vice President of Academics Affairs)', value: "VPAA" },
 ]
 
 
 export const assistedBy = [
-  {id: "alyanna", label: "Alyanna"},
-  {id: "emman", label: "Emman"},
-  {id: "laciste", label: "Laciste"},
-  {id: "kyle", label: "Kyle"},
-  {id: "juvi", label: "Juvi"},
+  { id: "alyanna", label: "Alyanna" },
+  { id: "emman", label: "Emman" },
+  { id: "laciste", label: "Laciste" },
+  { id: "kyle", label: "Kyle" },
+  { id: "juvi", label: "Juvi" },
 ] as const

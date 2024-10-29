@@ -182,7 +182,12 @@ export const CreateAppointmentSchema = z.object({
       }
     }
 
-    if(meeting_type_service.includes('training_others')){
+    if(meeting_type_service.includes('training_others') || 
+      meeting_type_service.includes('meeting_others') || 
+      meeting_type_service.includes('webinar_others') || 
+      meeting_type_service.includes('hybrid_others') || 
+      meeting_type_service.includes('documentation_others') || 
+      meeting_type_service.includes('events_others')){
       if(!other_training){
         ctx.addIssue({
           code: 'custom',

@@ -20,7 +20,7 @@ export async function CreateAppointment(form: CreateAppointmentSchemaType) {
         dry_run_end_time, does_have_assistance, name_of_assistance,
         meeting_type_option, meeting_type_service, reminder,
         panelist, meeting_type_link, camera_setup, status,
-        additional_date_information
+        additional_date_information, other_training
     } = parsedBody.data;
 
     const tcet_assistance = does_have_assistance.join();
@@ -53,7 +53,8 @@ export async function CreateAppointment(form: CreateAppointmentSchemaType) {
                     panelist,
                     meeting_type_link,
                     camera_setup,
-                    status
+                    status, 
+                    other_training
                 }
             });
 

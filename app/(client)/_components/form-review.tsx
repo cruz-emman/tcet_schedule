@@ -8,6 +8,7 @@ import { reminderChoice } from "@/lib/data";
 import CUSTOMLOGO_1 from '@/public/sample_logo.png';
 import CUSTOMLOGO2 from '@/public/logo2.png';
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 
 interface FinalizeFormProps {
     form: any;
@@ -19,12 +20,16 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
         contentRef
     });
 
+
+    console.log(form.watch('other_training'))
+
     const event_date = form.watch('event_date');
-    const dryrun_date = form.watch('dry_run_date')
+    const dryrun_date = form.watch('dry_run_date') ? form.watch('dry_run_date') : "None"
     const formattedDate = format(event_date, 'MMMM dd yyyy');
-    const formattedDryRunDate = format(dryrun_date, 'MMMM dd yyyy')
+    const formattedDryRunDate = form.watch(dryrun_date) ? format(dryrun_date, 'MMMM dd yyyy') : "None"
     const getServices = form.watch('meeting_type_service');
     const getDryRun = form.watch('does_have_dry_run');
+    const additional_information = form.watch('other_training')
 
 
     const returnArray = (data: string[]) => {
@@ -50,8 +55,14 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
     return (
         <ScrollArea className="h-[600px]  border border-gray-300 p-2">
 
-            <div ref={contentRef}>
+<Button type="button"
+                className="mb-5"
+                //@ts-ignore
+                onClick={reactToPrintFn}>
+                Print Form
+            </Button>
 
+            <div ref={contentRef}>
                 <div className="p-2 border-2 border-gray-400 m-2">
                     <div className="flex justify-between items-center mb-4">
                         <Image src={CUSTOMLOGO_1} className="w-20 h-20 object-contain" alt="logo" />
@@ -94,12 +105,29 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
                         <div>
                             <h3 className="font-bold mb-2 underline">Dry Run Information</h3>
                             <p className="capitalize"><strong>Dry Run:</strong> {dryrun}</p>
-                            <p className="capitalize"><strong>Dry Run Date:</strong> {formattedDryRunDate}</p>
-                            <p className="capitalize"><strong>Start:</strong> {form.watch('dry_run_start_time') || "None"}</p>
+                            <p className="capitalize"><strong>Dry Run Date:</strong> {formattedDryRunDate || "None"}</p>
+                            <p className="capitalize"><strong>Start:</strong> {form.watch('dry_run_start_time') || "None"}</p> 
                             <p className="capitalize"><strong>End:</strong> {form.watch('dry_run_end_time') || "None"}</p>
                             <p className="capitalize"><strong>Assistance:</strong> {form.watch('does_have_assistance') ? seperateAssistance.join(', ') : "None"}</p>
                         </div>
                     </div>
+
+                    
+                    {additional_information && (
+                      <>
+                       <hr className="my-2 bg-black"/>
+                       <div className="mb-4">
+                            <h3 className="font font-bold mb-2 underline">Additional Inputs</h3>
+                            <div className="mb-4">
+                            <Textarea
+                                className="w-full h-[150px]"
+                                disabled
+                            >{additional_information}</Textarea>
+                        </div>  
+                        </div>
+                      </>
+
+                    )}
 
                     {reminderExisting.length > 0 && (
                         <>
@@ -144,39 +172,11 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
                             </>
                         )}
                     </div>
-
-                    {/* {tcetAssistance.length > 0 && (
-                        <>
-                            <div>
-                                <h3 className="font-bold mb-2 underline">Assistance(s) Name</h3>
-                                {tcetAssistance.map((assistant: { name: string; email: string }, index: number) => (
-                                    <p key={index}>{assistant.name} - {assistant.email}</p>
-                                ))}
-                            </div>
-                        </>
-                    )}
-
-                    {showPanelist.length > 0 && (
-                        <>
-                            <hr className="my-2 bg-black " />
-                            <div className="mb-4">
-                                <h3 className="font-bold mb-2 underline">Panelist(s)</h3>
-                                {showPanelist.map((panel: { name: string; email: string }, index: number) => (
-                                    <p key={index}>{panel.name} - {panel.email}</p>
-                                ))}
-                            </div>
-                        </>
-                    )} */}
                 </div>
 
             </div>
 
-            <Button type="button"
-                className="mb-5"
-                //@ts-ignore
-                onClick={reactToPrintFn}>
-                Print Form
-            </Button>
+           
         </ScrollArea>
     );
 };
