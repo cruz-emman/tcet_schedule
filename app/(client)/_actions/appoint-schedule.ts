@@ -116,6 +116,7 @@ export async function CreateAppointment(form: CreateAppointmentSchemaType) {
                 "end_time": end_time,
                 "department": department,
                 "contact_person": contact_person,
+                "meeting_type_option": meeting_type_option,
 
                 "purpose": purpose,
                 "calendar_link": "https://tcet-schedule.vercel.app/"
