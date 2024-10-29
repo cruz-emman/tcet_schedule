@@ -101,27 +101,27 @@ export async function CreateAppointment(form: CreateAppointmentSchemaType) {
 
 
 
-        // await client.sendEmailWithTemplate({
-        //     "From": "no-reply@tcet.tualearning.com",
-        //     "To": email,
-        //     "TemplateId": 37433358,
-        //     "TemplateModel": {
-        //         "company_email": "tcet@tua.edu.ph",
-        //         "company_name": "TCET",
-        //         "company_address": "275 E. Rodriguez Sr. Avenue, Quezon City, Philippines",
-        //         "fullname": fullname,
-        //         "title": title,
-        //         "event_date": event_date.toDateString(),
-        //         "start_time": start_time,
-        //         "end_time": end_time,
-        //         "department": department,
-        //         "contact_person": contact_person,
+        await client.sendEmailWithTemplate({
+            "From": "no-reply@tcet.tualearning.com",
+            "To": email,
+            "TemplateId": 37433358,
+            "TemplateModel": {
+                "company_email": "tcet@tua.edu.ph",
+                "company_name": "TCET",
+                "company_address": "275 E. Rodriguez Sr. Avenue, Quezon City, Philippines",
+                "fullname": fullname,
+                "title": title,
+                "event_date": event_date.toDateString(),
+                "start_time": start_time,
+                "end_time": end_time,
+                "department": department,
+                "contact_person": contact_person,
 
-        //         "purpose": purpose,
-        //         "calendar_link": "https://tcet-schedule.vercel.app/"
-        //     },
-        //     "MessageStream": "outbound"
-        // });
+                "purpose": purpose,
+                "calendar_link": "https://tcet-schedule.vercel.app/"
+            },
+            "MessageStream": "outbound"
+        });
         //end of try
     } catch (error) {
         console.error('Error creating appointment:', error);
