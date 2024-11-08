@@ -2,6 +2,7 @@
 import { db } from "@/lib/db"
 import { DateToUTCDate } from "@/lib/helpers"
 import { CreateAppointmentSchema, CreateAppointmentSchemaType } from "@/schema/appointment"
+import { format } from "date-fns"
 import * as postmark from "postmark"
 
 const serverToken = process.env.NEXT_PUBLIC_POSTMARK_SERVER_TOKEN as string
@@ -27,6 +28,10 @@ export async function CreateAppointment(form: CreateAppointmentSchemaType) {
     const meeting_service = meeting_type_service.join();
     const event_actual_date = DateToUTCDate(event_date);
     const dryRunDate = dry_run_date ? DateToUTCDate(dry_run_date) : null;
+
+    const formattedDate = format(new Date(event_actual_date), 'MMM dd, yyyy')
+
+    console.log(formattedDate)
 
 
     const currentReminder = reminder ? reminder.join(',') : '';
@@ -111,13 +116,12 @@ export async function CreateAppointment(form: CreateAppointmentSchemaType) {
                 "company_address": "275 E. Rodriguez Sr. Avenue, Quezon City, Philippines",
                 "fullname": fullname,
                 "title": title,
-                "event_date": event_date.toDateString(),
+                "event_date": formattedDate,
                 "start_time": start_time,
                 "end_time": end_time,
                 "department": department,
                 "contact_person": contact_person,
                 "meeting_type_option": meeting_type_option,
-
                 "purpose": purpose,
                 "calendar_link": "https://tcet-schedule.vercel.app/"
             },

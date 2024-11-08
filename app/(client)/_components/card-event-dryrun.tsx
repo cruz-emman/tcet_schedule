@@ -22,12 +22,11 @@ type Props = {
 };
 
 export const CardEventDryRun = ({ data }: Props) => {
-  console.log(data)
   return (
     <Card className="w-10/12">
       <CardHeader>
         <CardTitle>{data?.title}</CardTitle>
-        <CardDescription className="capitalize">{data?.meeting_type_option}</CardDescription>
+        <CardDescription className="capitalize">Reserved</CardDescription>
       </CardHeader>
       <CardContent>
         {data?.venue && (

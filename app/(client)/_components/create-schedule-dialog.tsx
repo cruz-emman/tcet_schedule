@@ -189,6 +189,8 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
       // // Clean up the URL object
       // URL.revokeObjectURL(link.href);
 
+      
+
       form.reset();
       setStep(0)
       setDialogOpen(false);
@@ -196,6 +198,12 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
       setConfirmAgreement(false)
 
       queryClient.invalidateQueries({ queryKey: ["appointment"] });
+
+      setTimeout(() => {
+        window.open('https://docs.google.com/forms/d/e/1FAIpQLSeF2jcpqfKJVz7ABgz1wS8XGlzmULO2mMJCSuUVCU3aScB5Vg/viewform','_blank')
+
+      }, 1000)
+
     }
 
   })
@@ -324,7 +332,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                   name="fullname"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Scheduled By: (required)</FormLabel>
+                      <FormLabel>Requested By: (required)</FormLabel>
                       <FormControl>
                         <Input placeholder="Scheduled By" {...field} />
                       </FormControl>

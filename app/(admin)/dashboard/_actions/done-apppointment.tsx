@@ -2,6 +2,9 @@
 
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
+import * as postmark from "postmark"
+
+
 
 export async function DoneAppointment(id: string) {
     const session = await auth()
@@ -38,6 +41,9 @@ export async function DoneAppointment(id: string) {
             return data;
         })
 
+       
+
+        console.log(result)
         return result
     } catch (error) {
         throw error;

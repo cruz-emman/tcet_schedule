@@ -97,6 +97,8 @@ const ActionCell = ({ row } : any) => {
     },
   });
 
+  
+
   const { mutate: pendingButton } = useMutation({
     mutationFn: (id: string) => PendingAppointment(id),
     onError: (error) => {
@@ -123,23 +125,6 @@ const ActionCell = ({ row } : any) => {
     },
     onSuccess: () => {
       toast.warning(`Appointment named ${row.original.title} has been cancel  🎉`, {
-        id: "update-appointment-success"
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["data", "history"]
-      });
-    }
-  });
-
-  const { mutate: softDelete } = useMutation({
-    mutationFn: (id: string) => SoftDeleteAppointment(id),
-    onError: (error) => {
-      toast.error(`Failed to update appointment`, {
-        id: "update-appointment-error"
-      });
-    },
-    onSuccess: () => {
-      toast.warning(`Appointment named ${row.original.title} has been deleted permanently 🎉`, {
         id: "update-appointment-success"
       });
       queryClient.invalidateQueries({
@@ -414,10 +399,6 @@ const OverviewTable = ({ from, to }: Props) => {
         </div>
         <div className='flex flex-wrap gap-2'>
           <DataTableViewOptions table={table} />
-          {/* <Button variant={"outline"} size={"sm"} className='ml-auto h-8 lg:flex' >
-            <DownloadIcon className='mr-2 h-4 w-4' />
-            Export CSV
-          </Button> */}
         </div>
       </div>
       <SkeletonWrapper isLoading={history.isFetching}>
