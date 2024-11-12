@@ -1,4 +1,4 @@
-wimport { db } from "@/lib/db";
+import { db } from "@/lib/db";
 import { Period, Services, TimeFrame } from "@/lib/types";
 import { getDaysInMonth } from "date-fns";
 import { z } from "zod";
