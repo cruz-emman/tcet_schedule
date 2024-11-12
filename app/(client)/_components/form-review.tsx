@@ -21,7 +21,6 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
     });
 
 
-    console.log(form.watch('other_training'))
 
     const event_date = form.watch('event_date');
     const dryrun_date = form.watch('dry_run_date') ? form.watch('dry_run_date') : "None"
@@ -53,7 +52,7 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
     const reminderExisting = isReminderExisting(showReminder);
 
     return (
-        <ScrollArea className="h-[600px]  border border-gray-300 p-2">
+        <>
 
 <Button type="button"
                 className="mb-5"
@@ -177,7 +176,7 @@ const FinalizeForm = ({ form }: FinalizeFormProps) => {
             </div>
 
            
-        </ScrollArea>
+        </>
     );
 };
 

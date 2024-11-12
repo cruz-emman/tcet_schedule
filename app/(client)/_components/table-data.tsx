@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { BadgeCheck, BadgeX } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const dataTable = [
   {
@@ -71,7 +72,8 @@ const dataTable = [
 
 function TableDataSample() {
   return (
-    <Table>
+    <ScrollArea className="h-full w-full border-r-2 ">
+      <Table className="">
       <TableHeader>
         <TableRow>
           <TableHead>Features</TableHead>
@@ -89,6 +91,7 @@ function TableDataSample() {
         ))}
       </TableBody>
     </Table>
+    </ScrollArea>
   );
 }
 

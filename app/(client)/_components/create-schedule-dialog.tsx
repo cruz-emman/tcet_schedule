@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import SelectFieldInput from './select-field_input';
 import { departmentOptions, does_have_assistance_choice, eventsChoice, hybridChoice, photoVideoChoice, purposeChoice, trainingChoice, zoomMeetingChoice, zoomWebinarChoice } from '@/lib/data';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -44,6 +44,8 @@ import AdditionalDate from '../../../components/additonal_date';
 import TCETLOGO from '@/public/sample_logo.png'
 import tcet_logo_2 from '@/public/logo2.png'
 import DownloadButton from "./download-pdfbutton";
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useRouter } from 'next/navigation';
 
 
 interface Props {
@@ -99,6 +101,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
   const [confirmAgreement, setConfirmAgreement] = useState(false);
 
 
+  const navigate = useRouter()
   const [step, setStep] = useState(0);
   const currentStep = steps[step];
 
@@ -174,46 +177,33 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
     onSuccess: async () => {
       toast.success('Your schedule has been submitted upon approval. Kindly wait 1-2 days for your request to be approved working! 🎉', {
         id: "create-appointment"
-      })
-
-
-      // Generate PDF document blob
-      // const blob = await pdf(<MyDoc />).toBlob();
-
-      // // Trigger file download  
-      // const link = document.createElement('a');
-      // link.href = URL.createObjectURL(blob);
-      // link.download = 'appointment_schedule.pdf';
-      // link.click();
-
-      // // Clean up the URL object
-      // URL.revokeObjectURL(link.href);
-
-      
-
+      });
+  
       form.reset();
-      setStep(0)
+      setConfirmAgreement(false);
+      setStep(0);
       setDialogOpen(false);
       setOpen(false);
-      setConfirmAgreement(false)
-
       queryClient.invalidateQueries({ queryKey: ["appointment"] });
-
+  
       setTimeout(() => {
-        window.open('https://docs.google.com/forms/d/e/1FAIpQLSeF2jcpqfKJVz7ABgz1wS8XGlzmULO2mMJCSuUVCU3aScB5Vg/viewform','_blank')
-
-      }, 1000)
-
+        window.open('https://docs.google.com/forms/d/e/1FAIpQLSeF2jcpqfKJVz7ABgz1wS8XGlzmULO2mMJCSuUVCU3aScB5Vg/viewform', '_blank');
+      }, 1000);
+    },
+    onError: async () => {
+      toast.error('Sorry, you might have inputted incorrect information. Please check the email and try again.', {
+        id: "create-appointment-error"
+      });
+  
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     }
-
-  })
-
-
-
+  });
+  
 
   const onSubmit = useCallback((values: CreateAppointmentSchemaType) => {
     toast.loading("Creating Appointment...", { id: 'create-appointment' });
-    //console.log(values)
 
     mutate(values)
 
@@ -248,6 +238,11 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
 
 
 
+  useEffect(() => {
+    if(dialogOpen === true){
+      setConfirmAgreement(false)
+    }
+  }, [dialogOpen])
 
 
   useEffect(() => {
@@ -279,7 +274,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
       <DialogTrigger asChild>
         <Button
           disabled={!open}
-          className='w-[120px] text-right'
+          className='w-[120px] mt-10 text-right'
           color="primary-foreground"
           onClick={() => setDialogOpen(true)}
 
@@ -287,8 +282,10 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
       </DialogTrigger>
       <DialogContent className={
         cn(
-          `max-w-[400px]  md:max-w-7xl`,
-          step === 3 && 'md:max-w-[1200px]'
+          'max-w-[90vw] h-auto',  // Default size for small screens
+          'md:max-w-3xl lg:max-w-4xl ',  // Larger sizes for medium and large screens
+          step === 3 && 'max-w-full lg:h-auto',
+
         )}>
         <DialogHeader>
           <DialogTitle>{currentStep.name}</DialogTitle>
@@ -297,10 +294,11 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
           </DialogDescription>
         </DialogHeader>
         <Form {...form} >
-          <form onSubmit={form.handleSubmit(onSubmit)} >
+          <form className='' onSubmit={form.handleSubmit(onSubmit)} >
 
             {step == 0 && (
-              <div className='flex flex-col gap-y-2'>
+              <ScrollArea className='h-[400px]'>
+                <div className='flex flex-col gap-y-2 px-4'>
                 <FormField
                   control={form.control}
                   name="title"
@@ -310,7 +308,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                       <FormControl>
                         <Input type='text' placeholder="Title" {...field} />
                       </FormControl>
-                      <FormMessage />
+
                     </FormItem>
                   )}
                 />
@@ -323,7 +321,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                       <FormControl>
                         <Input type="email" placeholder="Email" {...field} />
                       </FormControl>
-                      <FormMessage />
+
                     </FormItem>
                   )}
                 />
@@ -336,7 +334,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                       <FormControl>
                         <Input placeholder="Scheduled By" {...field} />
                       </FormControl>
-                      <FormMessage />
+
                     </FormItem>
                   )}
                 />
@@ -349,7 +347,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                       <FormControl>
                         <Input placeholder="Contact Person" {...field} />
                       </FormControl>
-                      <FormMessage />
+
                     </FormItem>
                   )}
                 />
@@ -366,134 +364,142 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {departmentOptions.map((item) => (
-                            <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
-
-                          ))}
+                          <SelectGroup>
+                            <SelectLabel className='font-bold text-xl pb-5'>Departments</SelectLabel>
+                            {departmentOptions.map((item) => {
+                              let acro = item.label.split('-')[0]
+                              let fullName = item.label.split('-')[1]
+                            return (
+                              <SelectItem key={item.value} value={item.value}>
+                                <span className='font-semibold'>{acro}</span> - 
+                                {fullName}
+                                </SelectItem>
+                            )
+                          })}
+                          </SelectGroup>
                         </SelectContent>
                       </Select>
 
-                      <FormMessage />
+
                     </FormItem>
                   )}
                 />
               </div>
+              </ScrollArea>
             )}
             {step == 1 && (
-              <div className='flex flex-col gap-y-2'>
+             <ScrollArea className='h-[400px]'>
+               <div className='flex flex-col gap-y-2 p-4'>
+                  <div className='flex flex-col  gap-2 w-full'>
 
-
-
-
-
-                <div className='flex flex-col  gap-2 w-full'>
-
-                  <SeletGroupFieldInput
-                    name="start_time"
-                    placeholder="Select time"
-                    control={form.control}
-                    label="Start"
-                  />
-                  <SeletGroupFieldInput
-                    name="end_time"
-                    placeholder="Select time"
-                    control={form.control}
-                    label="End"
-                  />
-
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="event_date"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Date of event</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                      </Popover>
-                    </FormItem>
-                  )}
-                />
-
-                {/* Recurring DATE */}
-                <FormField
-                  control={form.control}
-                  name="additonal_date"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md  ">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormLabel>
-                        Recurring Date
-                      </FormLabel>
-                    </FormItem>
-                  )}
-                />
-
-
-                {form.watch('additonal_date') === true && (
-                  <>
-                    <AdditionalDate
+                    <SeletGroupFieldInput
+                      name="start_time"
+                      placeholder="Select time"
                       control={form.control}
-                      name="additional_date_information"
-                      pickedDate={pickedDate}
-                      label="Required if click the checkbox, unclick if not"
+                      label="Start"
                     />
-                  </>
-                )}
+                    <SeletGroupFieldInput
+                      name="end_time"
+                      placeholder="Select time"
+                      control={form.control}
+                      label="End"
+                    />
 
-                <SelectFieldInput
-                  control={form.control}
-                  name="purpose"
-                  label="Purpose"
-                  placeholder="select a purpose"
-                  data={purposeChoice}
-                />
-                <FormField
-                  control={form.control}
-                  name="venue"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Venue (optional)</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Venue"
-                          {...field}
-                          value={field.value ?? ""} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="event_date"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Date of event</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+
+                                variant={"outline"}
+                                className={cn(
+                                  "w-full pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                        </Popover>
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Recurring DATE */}
+                  <FormField
+                    control={form.control}
+                    name="additonal_date"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md  ">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel>
+                          Recurring Date
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+
+
+                  {form.watch('additonal_date') === true && (
+                    <>
+                      <AdditionalDate
+                        control={form.control}
+                        name="additional_date_information"
+                        pickedDate={pickedDate}
+                        label="Required if click the checkbox, unclick if not"
+                      />
+                    </>
                   )}
-                />
+
+                  <SelectFieldInput
+                    control={form.control}
+                    name="purpose"
+                    label="Purpose"
+                    placeholder="select a purpose"
+                    data={purposeChoice}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="venue"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Venue (optional)</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Venue"
+                            {...field}
+                            value={field.value ?? ""} />
+                        </FormControl>
+
+                      </FormItem>
+                    )}
+                  />
 
 
               </div>
+             </ScrollArea>
             )}
             {step == 2 && (
-              <div className='flex flex-col gap-y-2'>
+              <ScrollArea className='h-[300px]'>
+<div className='flex flex-col gap-y-2 p-4'>
                 <FormField
                   control={form.control}
                   name="does_have_dry_run"
@@ -571,17 +577,17 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                                           //   new Date(date) <= new Date()
                                           // } 
                                           // Disable past dates and today's date
-                                           disabled={[
-                                              { before: new Date() },
-                                              { after: pickedDate! }
-                                            ]} 
+                                          disabled={[
+                                            { before: new Date() },
+                                            { after: pickedDate! }
+                                          ]}
                                           selected={field.value}
                                           onSelect={field.onChange}
                                           initialFocus
                                         />
                                       </PopoverContent>
                                     </Popover>
-                                    <FormMessage />
+
                                   </FormItem>
                                 )}
                               />
@@ -604,7 +610,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                         </FormItem>
                       )}
 
-                      <FormMessage />
+
                     </FormItem>
                   )}
                 />
@@ -662,7 +668,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                           }}
                         />
                       ))}
-                      <FormMessage />
+
                     </FormItem>
                   )}
                 />
@@ -680,17 +686,16 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
 
                 )}
               </div>
+              </ScrollArea>
             )}
             {step == 3 && (
+              <ScrollArea className='h-[400px]'>
               <div className='flex gap-2 '>
-                <div className="flex flex-col w-full  md:flex-row gap-x-2 ">
+                <div className="flex flex-col w-full md:flex-row gap-x-4">
                   <div className=" flex-1 hidden md:flex">
                     <TableDataSample />
                   </div>
-                  <Separator
-                    className="mr-4 bg-violet-400 hidden md:block "
-                    orientation="vertical"
-                  />
+
                   <div className="flex flex-col gap-y-2 flex-1 ">
                     <FormField
                       control={form.control}
@@ -729,7 +734,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                             </SelectContent>
                           </Select>
 
-                          <FormMessage />
+
                         </FormItem>
                       )}
                     />
@@ -794,7 +799,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                                   </FormItem>
                                 </RadioGroup>
                               </FormControl>
-                              <FormMessage />
+
                             </FormItem>
                           )}
                         />
@@ -836,7 +841,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                           trainingName="other_training"
 
                         />
-                    </>
+                      </>
                     )}
 
                     {meetingType === "events" && (
@@ -855,9 +860,11 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                   </div>
                 </div>
               </div>
+              </ScrollArea>
             )}
             {step == 4 && (
-              <div className='flex flex-col gap-2'>
+              <ScrollArea className='h-[420px]'>
+                  <div className='flex flex-col gap-2'>
                 <FinalizeForm form={form} />
 
                 <div className="items-top flex space-x-2">
@@ -883,6 +890,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
                   </div>
                 </div>
               </div>
+              </ScrollArea>
             )}
           </form>
 
@@ -894,7 +902,7 @@ const CreateScheduleDialog = ({ open, setOpen, pickedDate }: Props) => {
 
 
               <Button
-                disabled={!confirmAgreement}
+                disabled={confirmAgreement === false}
                 onClick={form.handleSubmit(onSubmit)}
               >
                 {isPending && <div className='flex items-center gap-x-2'>

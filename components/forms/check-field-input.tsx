@@ -34,7 +34,6 @@ const CheckboxFieldInput = ({
   defaultValue
 }: CheckboxFieldInputProps) => {
 
-  console.log(openLiveStreaming)
   return (
     <>
       

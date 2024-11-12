@@ -71,26 +71,36 @@ interface HistoryData {
 }
 
 interface DepartmentCounts {
+  ACCOUNTING: number;
+  AIRGEO: number;
+  BAMO: number;
   CAHS: number;
   CASE: number;
-  CBMA: number;
   CEIS: number;
-  CHTM: number;
-  CMT: number;
-  SLCN: number;
-  THS: number;
-  AIRGEO: number;
   CHAPLAIN: number;
-  TGCC: number;
+  CMT: number;
+  GSO: number;
+  HRMO: number;
+  ICTO: number;
+  MDO: number;
+  MIO: number;
   OAR: number;
   OP: number;
-  OSMA: number;
-  PRPO: number;
+  OVF: number;
+  OVPSPILL: number;
+  PRPODMU: number;
+  PRPOEMU:number;
+  QASMO: number;
   SAC: number;
-  GC: number;
-  URDC: number;
-  VPAA: number;
-  GS: number;
+  SLCN:number;
+  TCET:number;
+  TCCD: number;
+  TGCC: number;
+  TOUA: number;
+  TUAIBAM: number;
+  TUALIBRARY: number;
+  URDC: number
+
 }
 
 
@@ -100,7 +110,37 @@ interface DepartmentCounts {
 const statusFilters = ['done', 'cancel']; // List of statuses to include
 
 async function getMonthZoomData(year: number, month: number, services: Services) {
-  const departments = ['CAHS', 'CASE', 'CBMA', 'CEIS', 'CHTM', 'CMT', 'SLCN', 'THS', 'AIRGEO', 'CHAPLAIN', 'TGCC', 'OAR', 'OP', 'OSMA', 'PRPO', 'SAC', 'GC','URDC', 'GS','VPAA']
+  const departments = [
+    "ACCOUNTING",
+    "AIRGEO",
+    "BAMO",
+    "CAHS",
+    "CASE",
+    "CEIS",
+    "CHAPLAIN",
+    "CMT",
+    "GSO",
+    "HRMO",
+    "ICTO",
+    "MDO",
+    "MIO",
+    "OAR",
+    "OP",
+    "OVF",
+    "OVPSPILL",
+    "PRPODMU",
+    "PRPOEMU",
+    "QASMO",
+    "SAC",
+    "SLCN",
+    "TCET",
+    "TCCD",
+    "TGCC",
+    "TOUA",
+    "TUAIBAM",
+    "TUALIBRARY",
+    "URDC",
+  ]
 
   const results = await Promise.all(
     departments.map(department =>

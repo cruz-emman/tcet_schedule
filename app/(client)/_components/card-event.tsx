@@ -6,6 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge"
+import { MeetingTypeOption } from "@/lib/data";
+import { cn } from "@/lib/utils";
 
 
 type Event = {
@@ -22,11 +25,25 @@ type Props = {
 };
 
 export const CardEvent = ({ data }: Props) => {
+
+
+  const ShowBadge = () => {
+    const result = MeetingTypeOption.filter((item) => item.value === data?.meeting_type_option)
+    return result[0].badgeColor
+  }
+
+
+
   return (
     <Card className="w-10/12">
       <CardHeader>
-        <CardTitle>{data?.title}</CardTitle>
-        <CardDescription className="capitalize">{data?.meeting_type_option}</CardDescription>
+        <CardTitle>{data?.department}</CardTitle>
+        <CardDescription className="capitalize font-bold text-red-500">Reserved</CardDescription>
+        <CardDescription>
+          <Badge className={ShowBadge()}>
+            {data?.meeting_type_option}
+          </Badge>
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {data?.venue && (

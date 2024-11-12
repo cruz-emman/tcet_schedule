@@ -54,49 +54,49 @@ const CheckboxFieldInput = ({
     <>
 
 
-      <FormField
-        control={control}
-        name={name}
-        defaultValue={defaultValue}
-        render={() => (
-          <FormItem>
-            {data.map((item) => (
-              <FormField
-                key={item.id}
-                control={control}
-                name={name}
-                render={({ field }) => {
-                  return (
-                    <FormItem
-                      key={item.id}
-                      className="flex flex-row items-start space-x-3 space-y-0"
-                    >
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value?.includes(item.id)}
-                          onCheckedChange={(checked) => {
-                            return checked
-                              ? field.onChange([...field.value, item.id])
-                              : field.onChange(
-                                field.value?.filter(
-                                  (value: any) => value !== item.id
-                                )
-                              );
-                          }}
-                        />
-                      </FormControl>
-                      <FormLabel className="font-normal">
-                        {item.label}
-                      </FormLabel>
-                    </FormItem>
-                  );
-                }}
-              />
-            ))}
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+        <FormField
+          control={control}
+          name={name}
+          defaultValue={defaultValue}
+          render={() => (
+            <FormItem>
+              {data.map((item) => (
+                <FormField
+                  key={item.id}
+                  control={control}
+                  name={name}
+                  render={({ field }) => {
+                    return (
+                      <FormItem
+                        key={item.id}
+                        className="flex flex-row items-start space-x-3 space-y-0"
+                      >
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value?.includes(item.id)}
+                            onCheckedChange={(checked) => {
+                              return checked
+                                ? field.onChange([...field.value, item.id])
+                                : field.onChange(
+                                  field.value?.filter(
+                                    (value: any) => value !== item.id
+                                  )
+                                );
+                            }}
+                          />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          {item.label}
+                        </FormLabel>
+                      </FormItem>
+                    );
+                  }}
+                />
+              ))}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
 
 
@@ -105,7 +105,6 @@ const CheckboxFieldInput = ({
 
 
 
-      <ScrollArea className="h-72 ">
         <Separator className="my-4" />
         {(openLiveStreaming.includes('webinar_reminder')) && (
           <div className="px-2 pt-5">
@@ -200,33 +199,33 @@ const CheckboxFieldInput = ({
             </div>
           )}
 
-        {(  openLiveStreaming.includes('training_others') || 
-            openLiveStreaming.includes('meeting_others') ||
-            openLiveStreaming.includes('webinar_others') ||
-            openLiveStreaming.includes('hybrid_others') ||
-            openLiveStreaming.includes('documentation_others') ||
-            openLiveStreaming.includes('events_others') ) && (
-          <div className="px-2 pt-5">
-            <FormField
-              control={linkControl}
-              name={"other_training"}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Additional Information </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Add additional requirements"
-                      className="resize-none"
-                      {...field}
-                    />
-                  </FormControl>
+        {(openLiveStreaming.includes('training_others') ||
+          openLiveStreaming.includes('meeting_others') ||
+          openLiveStreaming.includes('webinar_others') ||
+          openLiveStreaming.includes('hybrid_others') ||
+          openLiveStreaming.includes('documentation_others') ||
+          openLiveStreaming.includes('events_others')) && (
+            <div className="px-2 pt-5">
+              <FormField
+                control={linkControl}
+                name={"other_training"}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Additional Information </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Add additional requirements"
+                        className="resize-none"
+                        {...field}
+                      />
+                    </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
 
         {(openLiveStreaming.includes("meeting_hybrid") || openLiveStreaming.includes('webinar_hybrid')) && (
           <div className="px-2 pt-5">
@@ -263,7 +262,6 @@ const CheckboxFieldInput = ({
           </div>
         )}
 
-      </ScrollArea>
     </>
 
   );

@@ -54,7 +54,7 @@ interface Props {
 
 type OverviewTableRow = GetOverDataReponseType[0]
 
-const ActionCell = ({ row } : any) => {
+const ActionCell = ({ row }: any) => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const id = row.original.id;
@@ -97,7 +97,7 @@ const ActionCell = ({ row } : any) => {
     },
   });
 
-  
+
 
   const { mutate: pendingButton } = useMutation({
     mutationFn: (id: string) => PendingAppointment(id),
@@ -229,13 +229,28 @@ const ActionCell = ({ row } : any) => {
 
 
 const columns: ColumnDef<OverviewTableRow>[] = [
+
+  {
+    accessorKey: 'createdAt',
+    header: "Request Date",
+    cell: ({ row }) => {
+
+      const date = row.getValue('createdAt')
+      //@ts-ignore
+      const formatDate = format(new Date(date), "MMM dd, yyyy h:mm a	")
+
+      return (
+        <div className='text-xs font-semibold'>{formatDate}</div>
+      )
+    }
+  },
   {
     accessorKey: "event_date",
     header: "Date",
     cell: ({ row }) => {
       const res = row.getValue('event_date')
       //@ts-ignore
-      const formattedDate = format(new Date(res), "MMMM d, yyyy");
+      const formattedDate = format(new Date(res), "MMM dd, yyyy");
       return <div className='text-xs font-semibold' >{formattedDate} <span className='underline'> {row.original.start_time} - {row.original.end_time}</span> </div>
     }
   },
@@ -278,7 +293,7 @@ const columns: ColumnDef<OverviewTableRow>[] = [
         (status) => status.value === row.getValue("meeting_type_option")
       )
 
-      
+
 
       if (!status) {
         return null
@@ -288,7 +303,7 @@ const columns: ColumnDef<OverviewTableRow>[] = [
       return (
         //@ts-ignore
         <Badge variant={type} className={cn('flex w-[120px] justify-center text-sm',)}>
-         {status.label} 
+          {status.label}
         </Badge>
       )
     },
@@ -323,7 +338,7 @@ const columns: ColumnDef<OverviewTableRow>[] = [
   {
     accessorKey: "editedBy",
     header: "Assisted By",
-    cell: ({row}) => {
+    cell: ({ row }) => {
       return (
         <>{row.original.editedBy}</>
       )
