@@ -41,9 +41,7 @@ import { toast } from 'sonner';
 import { useCurrentUser } from '@/hooks/user-current-user';
 import DynamicInputField from './dynamic-input-field';
 import AdditionalDate from '../../../components/additonal_date';
-import TCETLOGO from '@/public/sample_logo.png'
-import tcet_logo_2 from '@/public/logo2.png'
-import DownloadButton from "./download-pdfbutton";
+
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useRouter } from 'next/navigation';
 
