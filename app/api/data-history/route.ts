@@ -50,17 +50,11 @@ async function getOverViewData(from: Date, to: Date) {
             },
             AND: [
                 { soft_delete: false },
-                {
-                    NOT: [
-                        { status: 'done' },
-                        { status: 'cancel' }
-                    ]
-
-                }
+                
             ]
         },
         orderBy: {
-            event_date: 'desc'
+            event_date: 'asc'
         },
         include: {
             User: {

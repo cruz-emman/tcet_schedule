@@ -402,7 +402,7 @@ const OverviewTable = ({ from, to }: Props) => {
 
 
   return (
-    <div className='w-full '>
+    <div className='w-full  '>
       <div className='flex flex-wrap items-end justify-between gap-2 py-4'>
         <div className='flex gap-2'>
           {table.getColumn('status') && (

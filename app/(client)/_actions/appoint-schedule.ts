@@ -31,7 +31,6 @@ export async function CreateAppointment(form: CreateAppointmentSchemaType) {
 
     const formattedDate = format(new Date(event_actual_date), 'MMM dd, yyyy')
 
-    console.log(formattedDate)
 
 
     const currentReminder = reminder ? reminder.join(',') : '';

@@ -6,6 +6,8 @@ import { differenceInDays, endOfMonth, startOfMonth } from 'date-fns'
 import React, { useState } from 'react'
 import { toast } from 'sonner'
 import OverviewTable from './OverviewTable'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import KanbanView from './KanbanView'
 
 const TableChart = () => {
   const [dateRange, setDateRange] = useState<{ from: Date, to: Date }>({
@@ -15,7 +17,7 @@ const TableChart = () => {
 
   return (
     <div className='flex flex-col relative mx-4'>
-      <DateRangePicker 
+      <DateRangePicker
         initialDateFrom={dateRange.from}
         initialDateTo={dateRange.to}
         showCompare={false}
@@ -34,9 +36,20 @@ const TableChart = () => {
           setDateRange({ from, to });
         }}
       />
-      <div className="">
-        <OverviewTable from={dateRange.from} to={dateRange.to} />
-      </div>
+      <Tabs defaultValue="kanban" className="w-full">
+        <div className='flex w-full justify-end px-4'>
+          <TabsList className='mt-5'>
+            <TabsTrigger value="kanban">Kanban</TabsTrigger>
+            <TabsTrigger value="table">Table</TabsTrigger>
+          </TabsList>
+        </div>
+        <TabsContent value="table">
+          <OverviewTable from={dateRange.from} to={dateRange.to} />
+        </TabsContent>
+        <TabsContent value="kanban">
+          <KanbanView from={dateRange.from} to={dateRange.to} />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

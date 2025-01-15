@@ -1,9 +1,7 @@
 
 
-import { auth } from '@/auth'
 import Navbar from '@/components/navbar'
 import { SideBar } from '@/components/sidebar'
-import SkeletonWrapper from '@/components/skeleton-wrapper'
 import React, { ReactNode } from 'react'
 import { Suspense } from 'react'
 
@@ -14,7 +12,6 @@ const LoadingFallback = () => (
 )
 
 const AuthenticatedLayout = async ({ children }: { children: ReactNode }) => {
-  const user = await auth()
   return (
     <div className="flex h-screen w-full flex-col">
     <Navbar />   

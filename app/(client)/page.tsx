@@ -31,11 +31,12 @@ const ClientDashboard = () => {
   const selectedDateDryRun = useQuery<GetSelectedDateResponseType>({
     queryKey: ['data', 'history', 'dryRun', date],
     //@ts-ignores
-  queryFn: () => fetch(`/api/data-dry-run?currentDate=${date.toISOString()}`).then((res) => res.json()),
+    queryFn: () => fetch(`/api/data-dry-run?currentDate=${date.toISOString()}`).then((res) => res.json()),
     enabled: !!date,
 
   })
 
+  
 
 
   return (

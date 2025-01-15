@@ -1,5 +1,4 @@
 import authConfig from "@/auth.config"
-import next from "next"
 import NextAuth from "next-auth"
 
 const { auth } = NextAuth(authConfig)

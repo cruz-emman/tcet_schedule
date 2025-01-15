@@ -5,25 +5,25 @@
 
 @layer base {
   :root {
-    --background: 142 46% 100%;
-    --foreground: 142 5% 10%;
-    --card: 142 46% 100%;
-    --card-foreground: 142 5% 15%;
-    --popover: 142 46% 100%;
-    --popover-foreground: 142 95% 10%;
-    --primary: 142 71.8% 29.2%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 142 30% 90%;
-    --secondary-foreground: 0 0% 0%;
-    --muted: 104 30% 95%;
-    --muted-foreground: 142 5% 40%;
-    --accent: 104 30% 90%;
-    --accent-foreground: 142 5% 15%;
-    --destructive: 0 50% 50%;
-    --destructive-foreground: 142 5% 100%;
-    --border: 142 30% 82%;
-    --input: 142 30% 50%;
-    --ring: 142 71.8% 29.2%;
+    --background: 0 0% 98%; /* Light gray background */
+    --foreground: 0 0% 20%; /* Dark gray for text */
+    --card: 0 0% 98%; /* Same light gray as background */
+    --card-foreground: 0 0% 20%; /* Dark gray for card text */
+    --popover: 0 0% 98%; /* Light gray for popovers */
+    --popover-foreground: 0 0% 20%; /* Dark gray for popover text */
+    --primary: 0 0% 50%; /* Medium gray */
+    --primary-foreground: 0 0% 100%; /* White */
+    --secondary: 0 0% 90%; /* Very light gray */
+    --secondary-foreground: 0 0% 10%; /* Almost black */
+    --muted: 0 0% 95%; /* Light gray for muted elements */
+    --muted-foreground: 0 0% 40%; /* Mid-gray for muted text */
+    --accent: 0 0% 90%; /* Very light gray */
+    --accent-foreground: 0 0% 20%; /* Dark gray */
+    --destructive: 0 50% 50%; /* Red tone remains for destructive actions */
+    --destructive-foreground: 0 0% 100%; /* White for destructive foreground */
+    --border: 0 0% 82%; /* Gray for borders */
+    --input: 0 0% 70%; /* Medium gray for inputs */
+    --ring: 0 0% 50%; /* Gray ring */
     --radius: 0.5rem;
   }
 

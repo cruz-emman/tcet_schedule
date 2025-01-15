@@ -1,9 +1,6 @@
-import { auth } from '@/auth'
-import { DateRangePicker } from '@/components/ui/date-range-picker'
 import Widgets from '@/components/widget'
 import React from 'react'
 import TableChart from './_components/TableChart'
-import { redirect } from 'next/navigation'
 
 const AdminDashboard = async () => {
 
