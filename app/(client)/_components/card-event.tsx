@@ -27,34 +27,39 @@ type Props = {
 export const CardEvent = ({ data }: Props) => {
 
 
-  const ShowBadge = () => {
-    const result = MeetingTypeOption.filter((item) => item.value === data?.meeting_type_option)
-    return result[0].badgeColor
-  }
+  const getBadgeColor = () => {
+    const result = MeetingTypeOption.find((item) => item.value === data?.meeting_type_option);
+    return result?.badgeColor ?? '';
+  };
 
 
 
   return (
-    <Card className="w-10/12">
+       <Card className="w-10/12">
       <CardHeader>
         <CardTitle>{data?.department}</CardTitle>
-        <CardDescription className="capitalize font-bold text-red-500">Reserved</CardDescription>
-        <CardDescription>
-          <Badge className={ShowBadge()}>
+        <CardDescription className="capitalize font-bold text-red-500">
+          Reserved
+        </CardDescription>
+        <div>
+          <Badge className={getBadgeColor()}>
             {data?.meeting_type_option}
           </Badge>
-        </CardDescription>
+        </div>
       </CardHeader>
       <CardContent>
         {data?.venue && (
-          <p>Venue <span>{data?.venue}
-          </span></p>
+          <div className="flex gap-2">
+            <span className="font-medium">Venue:</span>
+            <span>{data.venue}</span>
+          </div>
         )}
-
       </CardContent>
       <CardFooter>
-        <p>{data?.start_time} to {data?.end_time}</p>
+        <div className="text-sm text-gray-600">
+          {data?.start_time} to {data?.end_time}
+        </div>
       </CardFooter>
     </Card>
-  );
+  )
 };

@@ -24,7 +24,7 @@ const events: Event[] = [
   {
     id: "1",
     title: "TCET Session",
-    date: new Date(2024, 10, 29), // November 29, 2024
+    date: new Date(2025, 0, 16), // November 29, 2025
     startTime: "07:00 AM",
     endTime: "08:00 AM",
     status: "reserved",
@@ -33,7 +33,7 @@ const events: Event[] = [
   {
     id: "2",
     title: "Dry Run",
-    date: new Date(2024, 10, 29),
+    date: new Date(2025, 0, 16),
     startTime: "10:00 AM",
     endTime: "11:30 AM",
     status: "available",

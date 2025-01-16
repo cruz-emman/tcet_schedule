@@ -10,6 +10,7 @@ import { CardEvent } from './_components/card-event'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { format } from 'date-fns'
 import { CardEventDryRun } from './_components/card-event-dryrun'
+import LeftCalendarUpdated from './_components/left-calendar-updated'
 
 const ClientDashboard = () => {
   //if nothing is selected right now, get the current date, else choose
@@ -17,7 +18,7 @@ const ClientDashboard = () => {
   const [date, setDate] = useState<Date | undefined>(undefined);
 
   const formatDate = (date: Date) => {
-    return format(date, 'EEE MMMM dd yyyy').toLowerCase()
+    return format(date, 'EEE,  MMMM, dd yyyy').toLowerCase()
   }
 
   const selectedDate = useQuery<GetSelectedDateResponseType>({
@@ -25,28 +26,36 @@ const ClientDashboard = () => {
     //@ts-ignore
     queryFn: () => fetch(`/api/data-calendar?currentDate=${date.toISOString()}`).then((res) => res.json()),
     enabled: !!date,
-
+    
   })
 
+  
   const selectedDateDryRun = useQuery<GetSelectedDateResponseType>({
     queryKey: ['data', 'history', 'dryRun', date],
     //@ts-ignores
     queryFn: () => fetch(`/api/data-dry-run?currentDate=${date.toISOString()}`).then((res) => res.json()),
     enabled: !!date,
-
   })
+  
 
   
+  const listOfSelectedEvent = useQuery({
+    queryKey: ['list'],
+    //@ts-ignores
+    queryFn: () => fetch(`/api/data-calendar-circle`).then((res) => res.json()),
+  })
+
+ 
 
 
   return (
     <div className="w-full px-8 ">
       <div className="flex flex-col mt-2 md:flex-row gap-2  ">
         <div className="flex-1  w-full  ">
-          <LeftCalendar setDate={setDate} date={date} />
+          <LeftCalendar setDate={setDate} date={date} eventsList={listOfSelectedEvent.data} />
         </div>
         <div className="flex flex-col flex-1 gap-4 p-8 shadow-md border-2  rounded-3xl">
-          <p className='text-xl font-bold underline text-emerald-500'>SELECTED DAY&apos;S AGENDA  {date && (<span className='capitalize'>({formatDate(date)})</span>)} </p>
+          <p className='text-2xl font-semibold leading-none tracking-tight'>Event for {date && (<span className='capitalize'>({formatDate(date)})</span>)} </p>
           <div className='flex flex-col md:flex-row  w-full'>
             <div className="flex flex-col flex-1 w-full">
               <h1 className="text-lg font-semibold text-gray-400">Event Today</h1>
