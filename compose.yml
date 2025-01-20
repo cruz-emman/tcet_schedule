@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    develop:
+      watch:
+        - path: ./package.json
+          action: rebuild
+        - path: ./next.config.js
+          action: rebuild
+        - path: './package-lock.json'
+          action: rebuild
+        - path: .
+          target: /app
+          action: sync
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=mysql://root:admin@db:3306/next-sched
+    depends_on:
+            db:
+                condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+
+  db:
+    image: mysql:8.0
+    ports:
+      - 3307:3306
+    environment:
+      - MYSQL_ROOT=root
+      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_DATABASE=next-sched
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+        test: ["CMD", "mysqladmin" ,"ping", "-h", "db-1"]
+        timeout: 20s
+        retries: 10
+    restart: unless-stopped
+
+volumes:
+  mysql-data:
