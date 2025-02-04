@@ -2,14 +2,17 @@ FROM node
 
 WORKDIR /app
 
-COPY package*.json ./
-
-RUN npm install 
-
 COPY . .
-RUN npx prisma migrate reset
-RUN npx prisma generate && npx prisma db push
+
+RUN npm install --ignore-scripts
+
+# niremove ko na lahat ng related sa prisma and nilagay sa start.sh script
+COPY start.sh .
+RUN chmod +x start.sh
+
+# this is da key
+CMD sh ./start.sh 
 
 EXPOSE 3000
 
-CMD npm run dev
+

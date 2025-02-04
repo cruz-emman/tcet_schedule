@@ -46,10 +46,10 @@ import { cn } from '@/lib/utils';
 import { CancelAppointment } from '../_actions/cancel-appointment';
 
 
-interface Props {
-  from: Date;
-  to: Date;
-}
+  interface Props {
+    from: Date;
+    to: Date;
+  }
 
 
 type OverviewTableRow = GetOverDataReponseType[0]
