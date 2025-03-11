@@ -33,8 +33,8 @@ export async function RegisterAccount(form: RegisterSchemaType) {
         });
 
         return { success: true };
-    } catch (err) {
+    } catch (err:any) {
         console.error('Error during registration:', err);
-        throw new Error('Registration failed');
+        return { message: err.message, statusCode: 500 };
     }
 }
