@@ -32,7 +32,6 @@ const RegisterForm = () => {
             })
         },
         onError: (err) => {
-          console.log(err)
           toast.error(err.message);
       }
     })
