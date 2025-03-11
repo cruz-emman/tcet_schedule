@@ -2,7 +2,7 @@ import Widgets from '@/components/widget'
 import React from 'react'
 import TableChart from './_components/TableChart'
 
-const AdminDashboard = async () => {
+const AdminDashboard = () => {
 
 
 

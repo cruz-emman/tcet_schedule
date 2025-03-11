@@ -357,9 +357,9 @@ export const MeetingTypeOption = [
 
 export const departmentOptions = [
 
-  {label: 'Accounting - Finance and Accounting Office', value: "ACCOUNTING"},
+  { label: 'Accounting - Finance and Accounting Office', value: "ACCOUNTING"},
   { label: 'AIRGEO - (Alumni, Industry Relations, and Global Education Office)', value: "AIRGEO" },
-  {label: "BAMO - Building Administrator & Maintenance Office", value: "BAMO"},
+  { label: "BAMO - Building Administrator & Maintenance Office", value: "BAMO"},
   { label: 'CAHS - (College of Allied Health Sciences)', value: "CAHS" },
   { label: 'CASE - (College of Arts, Sciences, and Education)', value: "CASE" },
   { label: 'CBMA - (College of Business, Management & Accountancy)', value: "CBMA" },
